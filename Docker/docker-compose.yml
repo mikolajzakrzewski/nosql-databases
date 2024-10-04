@@ -1,0 +1,25 @@
+services:
+  pg:
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_USER: nbd
+      POSTGRES_PASSWORD: nbdpassword
+      POSTGRES_DB: nbddb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4:8
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: nbd@nbd.nbd
+      PGADMIN_DEFAULT_PASSWORD: nbdpassword
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+volumes:
+  pg:
+  pgadmin:
