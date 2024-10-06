@@ -1,3 +1,4 @@
+name: nbd
 services:
   pg:
     image: postgres:17
