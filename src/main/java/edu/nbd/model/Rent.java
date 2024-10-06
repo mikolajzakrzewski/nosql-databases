@@ -15,12 +15,11 @@ public class Rent {
     private LocalDateTime endTime;
     private double rentCost = 0;
 
-    public Rent(UUID idParameter, Client clientParameter, Vehicle vehicleParameter, LocalDateTime beginTimeParameter) {
-        this.id = idParameter;
-        this.client = clientParameter;
-        this.vehicle = vehicleParameter;
-
-        this.beginTime = Objects.requireNonNullElseGet(beginTimeParameter, LocalDateTime::now);
+    public Rent(UUID id, Client client, Vehicle vehicle, LocalDateTime beginTime) {
+        this.id = id;
+        this.client = client;
+        this.vehicle = vehicle;
+        this.beginTime = Objects.requireNonNullElseGet(beginTime, LocalDateTime::now);
     }
 
     public String getRentInfo() {

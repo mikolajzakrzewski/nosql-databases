@@ -4,27 +4,27 @@ public class MotorVehicle extends Vehicle {
 
     private final int engineDisplacement;
 
-    public MotorVehicle(String plateNumberMotorVehicle, int basePriceMotorVehicle, int engineDisplacementMotorVehicle) {
-        super(plateNumberMotorVehicle, basePriceMotorVehicle);
-        this.engineDisplacement = engineDisplacementMotorVehicle;
+    public MotorVehicle(String plateNumber, int basePrice, int engineDisplacement) {
+        super(plateNumber, basePrice);
+        this.engineDisplacement = engineDisplacement;
     }
 
     @Override
     public double getActualRentalPrice() {
-        double engineDisplacementFactorMotorVehicle;
+        double engineDisplacementFactor;
 
         if (engineDisplacement < 1000) {
-            engineDisplacementFactorMotorVehicle = 1.0;
+            engineDisplacementFactor = 1.0;
         } else if (engineDisplacement <= 2000) {
             double k = engineDisplacement - 1000;
-            engineDisplacementFactorMotorVehicle = 1 + k / 2000.0;
+            engineDisplacementFactor = 1 + k / 2000.0;
         } else {
-            engineDisplacementFactorMotorVehicle = 1.5;
+            engineDisplacementFactor = 1.5;
         }
 
-        double actualRentalPriceMotorVehicle = getBasePrice() * engineDisplacementFactorMotorVehicle;
-        actualRentalPriceMotorVehicle = Math.round(actualRentalPriceMotorVehicle * 100.0) / 100.0;
-        return actualRentalPriceMotorVehicle;
+        double actualRentalPrice = getBasePrice() * engineDisplacementFactor;
+        actualRentalPrice = Math.round(actualRentalPrice * 100.0) / 100.0;
+        return actualRentalPrice;
     }
 
     @Override
