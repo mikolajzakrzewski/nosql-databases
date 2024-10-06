@@ -5,8 +5,8 @@ public class Gold extends ClientType {
     private final int discountPercent;
 
     public Gold() {
-        super(4, 0);
-        this.discountPercent = 5;
+        super(4, 10);
+        this.discountPercent = 10;
     }
 
     @Override
