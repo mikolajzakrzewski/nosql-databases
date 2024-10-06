@@ -1,5 +1,7 @@
 package edu.nbd.model;
 
+import edu.nbd.exceptions.VehicleException;
+
 public abstract class Vehicle {
 
     private String plateNumber;

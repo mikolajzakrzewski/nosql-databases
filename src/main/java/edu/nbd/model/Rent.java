@@ -1,6 +1,9 @@
 package edu.nbd.model;
 
+import edu.nbd.exceptions.RentException;
+
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Rent {
@@ -17,11 +20,7 @@ public class Rent {
         this.client = clientParameter;
         this.vehicle = vehicleParameter;
 
-        if (beginTimeParameter == null) {
-            this.beginTime = LocalDateTime.now();
-        } else {
-            this.beginTime = beginTimeParameter;
-        }
+        this.beginTime = Objects.requireNonNullElseGet(beginTimeParameter, LocalDateTime::now);
     }
 
     public String getRentInfo() {

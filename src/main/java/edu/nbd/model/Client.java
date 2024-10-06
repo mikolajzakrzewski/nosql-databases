@@ -1,5 +1,7 @@
 package edu.nbd.model;
 
+import edu.nbd.exceptions.ClientException;
+
 public class Client {
 
     private String firstName;
