@@ -1,12 +1,33 @@
 package edu.nbd.model;
 
+import com.sun.istack.NotNull;
 import edu.nbd.exceptions.VehicleException;
+import jakarta.persistence.*;
+import java.util.UUID;
 
+import java.rmi.AccessException;
+
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class Vehicle {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
+
+    @Column(unique = true)
+    @NotNull
     private String plateNumber;
+
+    @Column
     private int basePrice;
-    private boolean archive = false;
+
+    @Column
+    private boolean archive;
+
+    public Vehicle() {
+
+    }
 
     public Vehicle(String plateNumber, int basePrice) {
         this.plateNumber = plateNumber;

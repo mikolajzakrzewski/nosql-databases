@@ -1,13 +1,28 @@
 package edu.nbd.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class ClientType {
 
-    private final int maxVehicles;
-    private final int discount;
+    @Id
+    @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
+    private long id;
+
+    @Column
+    private int maxVehicles;
+
+    @Column
+    private int discount;
 
     public ClientType(int maxVehicles, int discount) {
         this.maxVehicles = maxVehicles;
         this.discount = discount;
+    }
+
+    public ClientType() {
+
     }
 
     public int getMaxVehicles() {

@@ -1,25 +1,44 @@
 package edu.nbd.model;
 
 import edu.nbd.exceptions.RentException;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
+@Entity
 public class Rent {
 
-    private final UUID id;
-    private final Client client;
-    private final Vehicle vehicle;
-    private final LocalDateTime beginTime;
-    private LocalDateTime endTime;
+    @Id
+    @GeneratedValue
+    private UUID id;
+
+    @ManyToOne
+    @JoinColumn
+    private Client client;
+
+    @ManyToOne
+    @JoinColumn
+    private Vehicle vehicle;
+
+    @Column
+    private LocalDateTime beginTime;
+
+    @Column
+    private LocalDateTime endTime = null;
+
+    @Column
     private double rentCost = 0;
 
-    public Rent(UUID id, Client client, Vehicle vehicle, LocalDateTime beginTime) {
-        this.id = id;
+    public Rent(Client client, Vehicle vehicle, LocalDateTime beginTime) {
         this.client = client;
         this.vehicle = vehicle;
         this.beginTime = Objects.requireNonNullElseGet(beginTime, LocalDateTime::now);
+    }
+
+    public Rent() {
+
     }
 
     public String getRentInfo() {

@@ -3,7 +3,8 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
              version="3.0">
-  <persistence-unit name="default" transaction-type="JTA">
+  <persistence-unit name="default" transaction-type="RESOURCE_LOCAL">
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
     <class>edu.nbd.model.Bicycle</class>
     <class>edu.nbd.model.Client</class>
     <class>edu.nbd.model.ClientType</class>
@@ -14,12 +15,13 @@
     <class>edu.nbd.model.Vehicle</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
-    <validation-mode>CALLBACK</validation-mode>
     <properties>
-      <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/nbd"/>
+      <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/nbddb"/>
       <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
       <property name="javax.persistence.jdbc.user" value="nbd"/>
       <property name="javax.persistence.jdbc.password" value="nbdpassword"/>
+      <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+      <property name="hibernate.hbm2ddl.auto" value="update"/>
     </properties>
   </persistence-unit>
 </persistence>

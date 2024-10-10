@@ -1,12 +1,21 @@
 package edu.nbd.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+
+@Entity
 public class MotorVehicle extends Vehicle {
 
-    private final int engineDisplacement;
+    @Column
+    private int engineDisplacement;
 
     public MotorVehicle(String plateNumber, int basePrice, int engineDisplacement) {
         super(plateNumber, basePrice);
         this.engineDisplacement = engineDisplacement;
+    }
+
+    public MotorVehicle() {
+
     }
 
     @Override

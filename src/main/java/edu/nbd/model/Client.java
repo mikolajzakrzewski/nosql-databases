@@ -1,13 +1,26 @@
 package edu.nbd.model;
 
 import edu.nbd.exceptions.ClientException;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 
+@Entity
 public class Client {
 
+    @Id
+    private String personalID;
+
+    @Column
     private String firstName;
+
+    @Column
     private String lastName;
-    private final String personalID;
+
+    @ManyToOne(fetch = jakarta.persistence.FetchType.EAGER, cascade = {jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE})
     private ClientType clientType;
+
     private boolean isArchived = false;
 
     public Client(String firstName, String lastName, String personalID, ClientType clientType) {
@@ -15,6 +28,10 @@ public class Client {
         this.lastName = lastName;
         this.personalID = personalID;
         this.clientType = clientType;
+    }
+
+    public Client() {
+
     }
 
     public String getClientInfo() {
