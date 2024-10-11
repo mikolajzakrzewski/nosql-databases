@@ -1,11 +1,12 @@
 package edu.nbd.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "client_type")
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"client_type"}))
+@Table(name = "client_types", uniqueConstraints = @UniqueConstraint(columnNames = {"client_type"}))
 public abstract class ClientType {
 
     @Id
@@ -13,9 +14,11 @@ public abstract class ClientType {
     private long id;
 
     @Column
+    @NotNull
     private int maxVehicles;
 
     @Column
+    @NotNull
     private int discount;
 
     public ClientType(int maxVehicles, int discount) {

@@ -1,14 +1,14 @@
 package edu.nbd.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @DiscriminatorValue("Gold")
 public class Gold extends ClientType {
 
     @Column
+    @NotNull
     private int discountPercent;
 
     public Gold() {

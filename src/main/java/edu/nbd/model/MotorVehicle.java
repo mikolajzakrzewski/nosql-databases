@@ -1,9 +1,9 @@
 package edu.nbd.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "motor_vehicles")
 public class MotorVehicle extends Vehicle {
 
     @Column

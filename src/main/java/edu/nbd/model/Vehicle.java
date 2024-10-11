@@ -1,11 +1,11 @@
 package edu.nbd.model;
 
-import com.sun.istack.NotNull;
 import edu.nbd.exceptions.VehicleException;
 import jakarta.persistence.*;
-import java.util.UUID;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
-import java.rmi.AccessException;
+import java.util.UUID;
 
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
@@ -16,14 +16,16 @@ public abstract class Vehicle {
     private UUID id;
 
     @Column(unique = true)
-    @NotNull
+    @NotEmpty
     private String plateNumber;
 
     @Column
+    @NotNull
     private int basePrice;
 
     @Column
-    private boolean archive;
+    @NotNull
+    private boolean archived = false;
 
     public Vehicle() {
 
@@ -67,11 +69,11 @@ public abstract class Vehicle {
     }
 
     public boolean isArchived() {
-        return archive;
+        return archived;
     }
 
-    public void setArchive(boolean isArchived) {
-        this.archive = isArchived;
+    public void setArchived(boolean archived) {
+        this.archived = archived;
     }
 
     public String getInfo() {

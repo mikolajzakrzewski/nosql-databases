@@ -1,27 +1,33 @@
 package edu.nbd.model;
 
 import edu.nbd.exceptions.ClientException;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
+@Table(name = "clients")
 public class Client {
 
     @Id
+    @NotEmpty
     private String personalID;
 
     @Column
+    @NotEmpty
     private String firstName;
 
     @Column
+    @NotEmpty
     private String lastName;
 
     @ManyToOne
+    @NotNull
     private ClientType clientType;
 
-    private boolean isArchived = false;
+    @Column
+    @NotNull
+    private boolean archived = false;
 
     public Client(String firstName, String lastName, String personalID, ClientType clientType) {
         this.firstName = firstName;
@@ -71,7 +77,7 @@ public class Client {
         if (clientType != null) {
             this.clientType = clientType;
         } else {
-            throw new ClientException("Given client type pointer shouldn't be null.");
+            throw new ClientException("Given client type object shouldn't be null.");
         }
     }
 
@@ -84,11 +90,11 @@ public class Client {
     }
 
     public boolean isArchived() {
-        return isArchived;
+        return archived;
     }
 
-    public void setArchived(boolean isArchived) {
-        this.isArchived = isArchived;
+    public void setArchived(boolean archived) {
+        this.archived = archived;
     }
 
     public String getInfo() {

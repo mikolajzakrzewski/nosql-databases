@@ -1,13 +1,17 @@
 package edu.nbd.model;
 
+
 import edu.nbd.exceptions.RentException;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
 @Entity
+@Table(name = "rents")
 public class Rent {
 
     @Id
@@ -16,19 +20,24 @@ public class Rent {
 
     @ManyToOne
     @JoinColumn
+    @NotNull
     private Client client;
 
     @ManyToOne
     @JoinColumn
+    @NotNull
     private Vehicle vehicle;
 
     @Column
+    @NotNull
     private LocalDateTime beginTime;
 
     @Column
-    private LocalDateTime endTime = null;
+    @Nullable
+    private LocalDateTime endTime;
 
     @Column
+    @NotNull
     private double rentCost = 0;
 
     public Rent(Client client, Vehicle vehicle, LocalDateTime beginTime) {
@@ -46,7 +55,7 @@ public class Rent {
                 client.getClientInfo() +
                 vehicle.getVehicleInfo() +
                 beginTime.toString() +
-                (endTime != null ? endTime.toString() : "");
+                (endTime != null ? endTime.toString() : "current");
     }
 
     public UUID getId() {
@@ -69,11 +78,12 @@ public class Rent {
         return endTime;
     }
 
-    public void endRent(LocalDateTime endRentTime) {
-        if (endTime == null && (endRentTime.isAfter(beginTime) || endRentTime.isEqual(beginTime))) {
+    public void setEndTime(LocalDateTime endRentTime) {
+        if (endTime != null) {
+            throw new RentException("Rent already ended.");
+        }
+        if (endRentTime.isAfter(beginTime)) {
             endTime = endRentTime;
-        } else if (endTime == null) {
-            endTime = beginTime;
         } else {
             throw new RentException("Given end rent time should be after the begin time.");
         }

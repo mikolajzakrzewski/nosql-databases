@@ -36,7 +36,7 @@ public class ClientRepository implements Repository<Client> {
         try {
             transaction.begin();
             // Retrieve the client type from the database if it exists, otherwise create a new one
-            Query query = em.createNativeQuery("SELECT * FROM clienttype WHERE client_type = ?1", ClientType.class);
+            Query query = em.createNativeQuery("SELECT * FROM client_types WHERE client_type = ?1", ClientType.class);
             query.setParameter(1, client.getTypeInfo());
             ClientType clientType;
             try {
