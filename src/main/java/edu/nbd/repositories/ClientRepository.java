@@ -7,7 +7,11 @@ import jakarta.persistence.*;
 import java.util.List;
 
 public class ClientRepository implements Repository<Client> {
-    EntityManagerFactory emf = Persistence.createEntityManagerFactory("edu.nbd.carRental");
+    private final EntityManagerFactory emf;
+
+    public ClientRepository(EntityManagerFactory emf) {
+        this.emf = emf;
+    }
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
