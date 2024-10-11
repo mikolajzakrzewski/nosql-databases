@@ -1,12 +1,11 @@
 package edu.nbd.repositories;
 
-import edu.nbd.model.Client;
-import edu.nbd.model.ClientType;
+import edu.nbd.model.Vehicle;
 import jakarta.persistence.*;
 
 import java.util.List;
 
-public class ClientRepository implements Repository<Client> {
+public class VehicleRepository implements Repository<Vehicle> {
     EntityManagerFactory emf = Persistence.createEntityManagerFactory("edu.nbd.carRental");
 
     public EntityManager getEntityManager() {
@@ -14,41 +13,30 @@ public class ClientRepository implements Repository<Client> {
     }
 
     @Override
-    public Client findById(Object id) {
+    public Vehicle findById(Object id) {
         try (EntityManager em = getEntityManager()) {
-            // Return the client with the given id or null if it does not exist
-            return em.find(Client.class, id);
+            // Return the vehicle with the given id or null if it does not exist
+            return em.find(Vehicle.class, id);
         }
     }
 
     @Override
-    public List<Client> findAll() {
+    public List<Vehicle> findAll() {
         try (EntityManager em = getEntityManager()) {
-            TypedQuery<Client> query = em.createQuery("SELECT c FROM Client c", Client.class);
+            TypedQuery<Vehicle> query = em.createQuery("SELECT v FROM Vehicle v", Vehicle.class);
             return query.getResultList();
         }
     }
 
     @Override
-    public Client add(Client client) {
+    public Vehicle add(Vehicle vehicle) {
         EntityManager em = getEntityManager();
         EntityTransaction transaction = em.getTransaction();
         try {
             transaction.begin();
-            // Retrieve the client type from the database if it exists, otherwise create a new one
-            Query query = em.createNativeQuery("SELECT * FROM clienttype WHERE client_type = ?1", ClientType.class);
-            query.setParameter(1, client.getTypeInfo());
-            ClientType clientType;
-            try {
-                clientType = (ClientType) query.getSingleResult();
-            } catch (NoResultException e) {
-                clientType = client.getClientType();
-                em.persist(clientType);
-            }
-            client.setClientType(clientType);
-            em.persist(client);
+            em.persist(vehicle);
             transaction.commit();
-            return client;
+            return vehicle;
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
@@ -60,14 +48,14 @@ public class ClientRepository implements Repository<Client> {
     }
 
     @Override
-    public Client update(Client client) {
+    public Vehicle update(Vehicle vehicle) {
         EntityManager em = getEntityManager();
         EntityTransaction transaction = em.getTransaction();
         try {
             transaction.begin();
-            em.merge(client);
+            em.merge(vehicle);
             transaction.commit();
-            return client;
+            return vehicle;
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
@@ -79,16 +67,16 @@ public class ClientRepository implements Repository<Client> {
     }
 
     @Override
-    public Client delete(Client client) {
+    public Vehicle delete(Vehicle vehicle) {
         EntityManager em = getEntityManager();
         EntityTransaction transaction = em.getTransaction();
         try {
             transaction.begin();
-            // Merge the client to the managed one before removing it
-            Client managedClient = em.merge(client);
-            em.remove(managedClient);
+            // Merge the vehicle to the managed one before removing it
+            Vehicle managedVehicle = em.merge(vehicle);
+            em.remove(managedVehicle);
             transaction.commit();
-            return client;
+            return vehicle;
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();

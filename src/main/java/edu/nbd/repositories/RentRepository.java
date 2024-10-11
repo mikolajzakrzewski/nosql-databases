@@ -1,12 +1,11 @@
 package edu.nbd.repositories;
 
-import edu.nbd.model.Client;
-import edu.nbd.model.ClientType;
+import edu.nbd.model.Rent;
 import jakarta.persistence.*;
 
 import java.util.List;
 
-public class ClientRepository implements Repository<Client> {
+public class RentRepository implements Repository<Rent> {
     EntityManagerFactory emf = Persistence.createEntityManagerFactory("edu.nbd.carRental");
 
     public EntityManager getEntityManager() {
@@ -14,41 +13,30 @@ public class ClientRepository implements Repository<Client> {
     }
 
     @Override
-    public Client findById(Object id) {
+    public Rent findById(Object id) {
         try (EntityManager em = getEntityManager()) {
-            // Return the client with the given id or null if it does not exist
-            return em.find(Client.class, id);
+            // Return the rent with the given id or null if it does not exist
+            return em.find(Rent.class, id);
         }
     }
 
     @Override
-    public List<Client> findAll() {
+    public List<Rent> findAll() {
         try (EntityManager em = getEntityManager()) {
-            TypedQuery<Client> query = em.createQuery("SELECT c FROM Client c", Client.class);
+            TypedQuery<Rent> query = em.createQuery("SELECT r FROM Rent r", Rent.class);
             return query.getResultList();
         }
     }
 
     @Override
-    public Client add(Client client) {
+    public Rent add(Rent rent) {
         EntityManager em = getEntityManager();
         EntityTransaction transaction = em.getTransaction();
         try {
             transaction.begin();
-            // Retrieve the client type from the database if it exists, otherwise create a new one
-            Query query = em.createNativeQuery("SELECT * FROM clienttype WHERE client_type = ?1", ClientType.class);
-            query.setParameter(1, client.getTypeInfo());
-            ClientType clientType;
-            try {
-                clientType = (ClientType) query.getSingleResult();
-            } catch (NoResultException e) {
-                clientType = client.getClientType();
-                em.persist(clientType);
-            }
-            client.setClientType(clientType);
-            em.persist(client);
+            em.persist(rent);
             transaction.commit();
-            return client;
+            return rent;
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
@@ -60,14 +48,14 @@ public class ClientRepository implements Repository<Client> {
     }
 
     @Override
-    public Client update(Client client) {
+    public Rent update(Rent rent) {
         EntityManager em = getEntityManager();
         EntityTransaction transaction = em.getTransaction();
         try {
             transaction.begin();
-            em.merge(client);
+            em.merge(rent);
             transaction.commit();
-            return client;
+            return rent;
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
@@ -79,16 +67,16 @@ public class ClientRepository implements Repository<Client> {
     }
 
     @Override
-    public Client delete(Client client) {
+    public Rent delete(Rent rent) {
         EntityManager em = getEntityManager();
         EntityTransaction transaction = em.getTransaction();
         try {
             transaction.begin();
-            // Merge the client to the managed one before removing it
-            Client managedClient = em.merge(client);
-            em.remove(managedClient);
+            // Merge the rent to the managed one before removing it
+            Rent managedRent = em.merge(rent);
+            em.remove(managedRent);
             transaction.commit();
-            return client;
+            return rent;
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
