@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "client_type")
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"client_type"}))
 public abstract class ClientType {
 
     @Id

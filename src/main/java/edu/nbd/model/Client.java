@@ -18,7 +18,7 @@ public class Client {
     @Column
     private String lastName;
 
-    @ManyToOne(fetch = jakarta.persistence.FetchType.EAGER, cascade = {jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE})
+    @ManyToOne
     private ClientType clientType;
 
     private boolean isArchived = false;
@@ -93,6 +93,14 @@ public class Client {
 
     public String getInfo() {
         return getClientInfo();
+    }
+
+    public ClientType getClientType() {
+        return clientType;
+    }
+
+    public String getTypeInfo() {
+        return clientType.getClass().getSimpleName();
     }
 
     public String getId() {

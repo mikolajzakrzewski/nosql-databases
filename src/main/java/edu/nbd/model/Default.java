@@ -1,10 +1,10 @@
 package edu.nbd.model;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "default_type")
+@DiscriminatorValue("Default")
 public class Default extends ClientType {
 
     public Default() {
