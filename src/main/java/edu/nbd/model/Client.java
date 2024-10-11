@@ -4,6 +4,7 @@ import edu.nbd.exceptions.ClientException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "clients")
@@ -11,6 +12,7 @@ public class Client {
 
     @Id
     @NotEmpty
+    @Size(min = 11, max = 11)
     private String personalID;
 
     @Column

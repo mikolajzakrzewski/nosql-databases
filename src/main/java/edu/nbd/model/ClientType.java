@@ -1,6 +1,7 @@
 package edu.nbd.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
@@ -15,10 +16,12 @@ public abstract class ClientType {
 
     @Column
     @NotNull
+    @Min(1)
     private int maxVehicles;
 
     @Column
     @NotNull
+    @Min(0)
     private int discount;
 
     public ClientType(int maxVehicles, int discount) {

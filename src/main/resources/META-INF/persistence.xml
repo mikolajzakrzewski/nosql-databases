@@ -15,6 +15,7 @@
     <class>edu.nbd.model.Vehicle</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <shared-cache-mode>NONE</shared-cache-mode>
+    <validation-mode>CALLBACK</validation-mode>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/nbddb"/>
       <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>

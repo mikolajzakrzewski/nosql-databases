@@ -1,7 +1,5 @@
 package edu.nbd.model;
 
-import jakarta.persistence.Access;
-import jakarta.persistence.AccessType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 

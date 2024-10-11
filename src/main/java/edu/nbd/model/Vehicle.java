@@ -2,6 +2,7 @@ package edu.nbd.model;
 
 import edu.nbd.exceptions.VehicleException;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
@@ -21,6 +22,7 @@ public abstract class Vehicle {
 
     @Column
     @NotNull
+    @Min(1)
     private int basePrice;
 
     @Column

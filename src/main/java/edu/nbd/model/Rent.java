@@ -4,6 +4,7 @@ package edu.nbd.model;
 import edu.nbd.exceptions.RentException;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
@@ -38,6 +39,7 @@ public class Rent {
 
     @Column
     @NotNull
+    @Min(0)
     private double rentCost = 0;
 
     public Rent(Client client, Vehicle vehicle, LocalDateTime beginTime) {
