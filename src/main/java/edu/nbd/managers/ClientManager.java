@@ -18,12 +18,10 @@ public class ClientManager implements Serializable {
 
     public Client registerClient(Client client) {
         Client newClient = clientRepository.findById(client.getId());
-        if (newClient != null) {;
-            newClient.setArchived(false);
-            return newClient;
-            // albo tak? :
-            //clientRepository.update(client);
-            //return client
+        if (newClient != null) {
+            client.setArchived(false);
+            clientRepository.update(client);
+            return client;
         } else {
             clientRepository.add(client);
             return client;
@@ -32,7 +30,8 @@ public class ClientManager implements Serializable {
 
     public void unregisterClient(Client client) {
         if (client != null) {
-            client.setArchived(false);
+            client.setArchived(true);
+            clientRepository.update(client);
         }
     }
 }
