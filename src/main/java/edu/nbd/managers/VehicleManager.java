@@ -21,11 +21,10 @@ public class VehicleManager implements Serializable {
         if (newVehicle != null) {
             vehicle.setArchived(false);
             vehicleRepository.update(vehicle);
-            return vehicle;
         } else {
             vehicleRepository.add(vehicle);
-            return vehicle;
         }
+        return vehicle;
     }
 
     public void unregisterVehicle(Vehicle vehicle) {

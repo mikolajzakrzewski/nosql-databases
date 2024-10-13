@@ -21,11 +21,10 @@ public class ClientManager implements Serializable {
         if (newClient != null) {
             client.setArchived(false);
             clientRepository.update(client);
-            return client;
         } else {
             clientRepository.add(client);
-            return client;
         }
+        return client;
     }
 
     public void unregisterClient(Client client) {
