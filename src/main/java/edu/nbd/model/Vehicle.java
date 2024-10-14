@@ -9,11 +9,11 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class Vehicle {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue
     private UUID id;
 
     @Column(unique = true)
@@ -82,7 +82,7 @@ public abstract class Vehicle {
         return getVehicleInfo();
     }
 
-    public String getId() {
-        return getPlateNumber();
+    public UUID getId() {
+        return this.id;
     }
 }

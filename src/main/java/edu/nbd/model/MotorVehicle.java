@@ -3,7 +3,6 @@ package edu.nbd.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "motor_vehicles")
 public class MotorVehicle extends Vehicle {
 
     @Column
