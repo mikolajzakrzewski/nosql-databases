@@ -6,7 +6,11 @@ import jakarta.persistence.*;
 import java.util.List;
 
 public class RentRepository implements Repository<Rent> {
-    EntityManagerFactory emf = Persistence.createEntityManagerFactory("edu.nbd.carRental");
+    private final EntityManagerFactory emf;
+
+    public RentRepository(EntityManagerFactory emf) {
+        this.emf = emf;
+    }
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();

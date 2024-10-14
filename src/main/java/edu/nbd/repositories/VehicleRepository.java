@@ -6,7 +6,11 @@ import jakarta.persistence.*;
 import java.util.List;
 
 public class VehicleRepository implements Repository<Vehicle> {
-    EntityManagerFactory emf = Persistence.createEntityManagerFactory("edu.nbd.carRental");
+    private final EntityManagerFactory emf;
+
+    public VehicleRepository(EntityManagerFactory emf) {
+        this.emf = emf;
+    }
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();

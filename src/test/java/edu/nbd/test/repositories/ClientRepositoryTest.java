@@ -8,13 +8,15 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.*;
 
+import java.util.List;
+
 public class ClientRepositoryTest {
     private static EntityManagerFactory emf;
     private static ClientRepository clientRepository;
 
     @BeforeAll
     static void setUp() {
-        emf = jakarta.persistence.Persistence.createEntityManagerFactory("edu.nbd.carRentalTest");
+        emf = jakarta.persistence.Persistence.createEntityManagerFactory("edu.nbd.carRental");
         clientRepository = new ClientRepository(emf);
     }
 
@@ -29,6 +31,11 @@ public class ClientRepositoryTest {
 
     @AfterAll
     static void tearDown() {
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            em.createQuery("DELETE FROM Client c").executeUpdate();
+            em.getTransaction().commit();
+        }
         emf.close();
     }
 
@@ -49,7 +56,17 @@ public class ClientRepositoryTest {
         Client client2 = new Client("Firstname", "Lastname", "11111111112", new Default());
         clientRepository.add(client1);
         clientRepository.add(client2);
-        Assertions.assertEquals(clientRepository.findAll().size(), 2);
+        List<Client> addedClients = List.of(client1, client2);
+        List<Client> foundClients = clientRepository.findAll();
+        Assertions.assertEquals(foundClients.size(), 2);
+        boolean areClientsEqual = true;
+        for (int i = 0; i < foundClients.size(); i++) {
+            if (!foundClients.get(i).getClientInfo().equals(addedClients.get(i).getClientInfo())) {
+                areClientsEqual = false;
+                break;
+            }
+        }
+        Assertions.assertTrue(areClientsEqual);
     }
 
     @Test

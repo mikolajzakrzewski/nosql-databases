@@ -1,0 +1,138 @@
+package edu.nbd.test.repositories;
+
+import edu.nbd.model.*;
+import edu.nbd.repositories.ClientRepository;
+import edu.nbd.repositories.RentRepository;
+import edu.nbd.repositories.VehicleRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import org.junit.jupiter.api.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+public class RentRepositoryTest {
+    private static EntityManagerFactory emf;
+    private static ClientRepository clientRepository;
+    private static VehicleRepository vehicleRepository;
+    private static RentRepository rentRepository;
+
+    @BeforeAll
+    static void setUp() {
+        emf = jakarta.persistence.Persistence.createEntityManagerFactory("edu.nbd.carRental");
+        clientRepository = new ClientRepository(emf);
+        vehicleRepository = new VehicleRepository(emf);
+        rentRepository = new RentRepository(emf);
+    }
+
+    @BeforeEach
+    void clearDatabase() {
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            em.createQuery("DELETE FROM Rent r").executeUpdate();
+            em.createQuery("DELETE FROM Vehicle v").executeUpdate();
+            em.createQuery("DELETE FROM Client c").executeUpdate();
+            em.getTransaction().commit();
+        }
+    }
+
+    @AfterAll
+    static void tearDown() {
+        try (EntityManager em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            em.createQuery("DELETE FROM Rent r").executeUpdate();
+            em.createQuery("DELETE FROM Vehicle v").executeUpdate();
+            em.createQuery("DELETE FROM Client c").executeUpdate();
+            em.getTransaction().commit();
+        }
+        emf.close();
+    }
+
+    @Test
+    public void findById_RentInDB_RentReturned() {
+        Client client = new Client("Firstname", "Lastname", "11111111110", new Default());
+        Bicycle bicycle = new Bicycle("EL12345", 10);
+        Rent rent = new Rent(client, bicycle, LocalDateTime.now());
+        clientRepository.add(client);
+        vehicleRepository.add(bicycle);
+        rentRepository.add(rent);
+        UUID rentId = rent.getId();
+        Rent foundRent;
+        try (EntityManager em = emf.createEntityManager()) {
+            foundRent = em.find(Rent.class, rentId);
+        }
+        Assertions.assertEquals(rentRepository.findById(rentId).getRentInfo(), foundRent.getRentInfo());
+    }
+
+    @Test
+    public void findAll_TwoRentsInDB_TwoRentsListReturned() {
+        Bicycle bicycle = new Bicycle("EL12345", 10);
+        MotorVehicle motorVehicle = new MotorVehicle("EL12346", 10, 1000);
+        Client client = new Client("Firstname", "Lastname", "11111111110", new Default());
+        Client client2 = new Client("Firstname", "Lastname", "11111111111", new Gold());
+        clientRepository.add(client);
+        clientRepository.add(client2);
+        vehicleRepository.add(bicycle);
+        vehicleRepository.add(motorVehicle);
+        Rent rent = new Rent(client, bicycle, LocalDateTime.now());
+        Rent rent2 = new Rent(client2, motorVehicle, LocalDateTime.now());
+        rentRepository.add(rent);
+        rentRepository.add(rent2);
+        for (Vehicle vehicle : vehicleRepository.findAll()) {
+            System.out.println(vehicle.getId().toString());
+        }
+        List<Rent> addedRents = List.of(rent, rent2);
+        List<Rent> foundRents = rentRepository.findAll();
+        Assertions.assertEquals(foundRents.size(), 2);
+        boolean areRentsEqual = true;
+        for (int i = 0; i < foundRents.size(); i++) {
+            if (!foundRents.get(i).getRentInfo().equals(addedRents.get(i).getRentInfo())) {
+                areRentsEqual = false;
+                break;
+            }
+        }
+        Assertions.assertTrue(areRentsEqual);
+    }
+
+    @Test
+    public void add_ValidRent_RentAdded() {
+        Client client = new Client("Firstname", "Lastname", "11111111110", new Default());
+        MotorVehicle motorVehicle = new MotorVehicle("EL12346", 10, 1000);
+        clientRepository.add(client);
+        vehicleRepository.add(motorVehicle);
+        Rent rent = new Rent(client, motorVehicle, LocalDateTime.now());
+        rentRepository.add(rent);
+        UUID rentId = rent.getId();
+        Assertions.assertEquals(rentRepository.findById(rentId).getRentInfo(), rent.getRentInfo());
+    }
+
+    @Test
+    public void update_UpdatedRent_RentUpdated() {
+        Client client = new Client("Firstname", "Lastname", "11111111110", new Default());
+        Bicycle bicycle = new Bicycle("EL12345", 10);
+        clientRepository.add(client);
+        vehicleRepository.add(bicycle);
+        Rent rent = new Rent(client, bicycle, LocalDateTime.now());
+        rentRepository.add(rent);
+        UUID rentId = rent.getId();
+        LocalDateTime endTime = LocalDateTime.now().plusHours(10);
+        rent.setEndTime(endTime);
+        rentRepository.update(rent);
+        Assertions.assertEquals(rentRepository.findById(rentId).getEndTime(), endTime);
+    }
+
+    @Test
+    public void delete_RentInDB_RentRemoved() {
+        Client client = new Client("Firstname", "Lastname", "11111111110", new Default());
+        MotorVehicle motorVehicle = new MotorVehicle("EL12346", 10, 1000);
+        clientRepository.add(client);
+        vehicleRepository.add(motorVehicle);
+        Rent rent = new Rent(client, motorVehicle, LocalDateTime.now());
+        rentRepository.add(rent);
+        UUID rentID = rent.getId();
+        Assertions.assertNotNull(rentRepository.findById(rentID));
+        rentRepository.delete(rent);
+        Assertions.assertNull(rentRepository.findById(rentID));
+    }
+}
