@@ -31,6 +31,9 @@ public class Client {
     @NotNull
     private boolean archived = false;
 
+    @Version
+    private long version;
+
     public Client(String firstName, String lastName, String personalID, ClientType clientType) {
         this.firstName = firstName;
         this.lastName = lastName;

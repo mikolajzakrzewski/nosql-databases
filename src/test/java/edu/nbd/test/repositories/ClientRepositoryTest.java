@@ -6,6 +6,8 @@ import edu.nbd.model.Gold;
 import edu.nbd.repositories.ClientRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.persistence.RollbackException;
 import org.junit.jupiter.api.*;
 
 import java.util.List;
@@ -83,6 +85,32 @@ public class ClientRepositoryTest {
         client.setFirstName("AltFirstname");
         clientRepository.update(client);
         Assertions.assertEquals(clientRepository.findById("11111111112").getFirstName(), "AltFirstname");
+    }
+
+    @Test
+    public void update_SameClientTwiceSimultaneously_OptimisticLockExceptionThrown() {
+        Client client = new Client("Firstname", "Lastname", "11111111110", new Default());
+        clientRepository.add(client);
+        Client client1;
+        Client client2;
+        boolean exceptionThrown = false;
+        try (EntityManager em1 = emf.createEntityManager(); EntityManager em2 = emf.createEntityManager()) {
+            client1 = em1.find(Client.class, "11111111110");
+            client2 = em2.find(Client.class, "11111111110");
+            em1.getTransaction().begin();
+            em2.getTransaction().begin();
+            client1.setFirstName("AltFirstname");
+            client2.setFirstName("AltAltFirstname");
+            em1.merge(client1);
+            em2.merge(client2);
+            em1.getTransaction().commit();
+            em2.getTransaction().commit();
+        } catch (Exception e) {
+            exceptionThrown = true;
+            Assertions.assertInstanceOf(RollbackException.class, e);
+            Assertions.assertInstanceOf(OptimisticLockException.class, e.getCause());
+        }
+        Assertions.assertTrue(exceptionThrown);
     }
 
     @Test

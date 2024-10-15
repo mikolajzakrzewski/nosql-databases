@@ -6,6 +6,8 @@ import edu.nbd.repositories.RentRepository;
 import edu.nbd.repositories.VehicleRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.persistence.RollbackException;
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDateTime;
@@ -120,6 +122,40 @@ public class RentRepositoryTest {
         rent.setEndTime(endTime);
         rentRepository.update(rent);
         Assertions.assertEquals(rentRepository.findById(rentId).getEndTime(), endTime);
+    }
+
+    @Test
+    public void update_SameRentTwiceSimultaneously_OptimisticLockExceptionThrown() {
+        Client client = new Client("Firstname", "Lastname", "11111111110", new Default());
+        Client client2 = new Client("Firstname", "Lastname", "11111111111", new Gold());
+        Bicycle bicycle = new Bicycle("EL12345", 10);
+        MotorVehicle motorVehicle = new MotorVehicle("EL12346", 10, 1000);
+        clientRepository.add(client);
+        clientRepository.add(client2);
+        vehicleRepository.add(bicycle);
+        vehicleRepository.add(motorVehicle);
+        Rent rent = new Rent(client, bicycle, LocalDateTime.now());
+        Rent rent2 = new Rent(client2, motorVehicle, LocalDateTime.now());
+        rentRepository.add(rent);
+        UUID rentId = rent.getId();
+        boolean exceptionThrown = false;
+        try (EntityManager em1 = emf.createEntityManager(); EntityManager em2 = emf.createEntityManager()) {
+            rent = em1.find(Rent.class, rentId);
+            rent2 = em2.find(Rent.class, rentId);
+            em1.getTransaction().begin();
+            em2.getTransaction().begin();
+            rent.setEndTime(LocalDateTime.now().plusHours(10));
+            rent2.setEndTime(LocalDateTime.now().plusHours(20));
+            em1.merge(rent);
+            em2.merge(rent2);
+            em1.getTransaction().commit();
+            em2.getTransaction().commit();
+        } catch (Exception e) {
+            exceptionThrown = true;
+            Assertions.assertInstanceOf(RollbackException.class, e);
+            Assertions.assertInstanceOf(OptimisticLockException.class, e.getCause());
+        }
+        Assertions.assertTrue(exceptionThrown);
     }
 
     @Test

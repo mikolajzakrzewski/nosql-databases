@@ -29,6 +29,9 @@ public abstract class Vehicle {
     @NotNull
     private boolean archived = false;
 
+    @Version
+    private long version;
+
     public Vehicle() {
 
     }

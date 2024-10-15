@@ -42,6 +42,9 @@ public class Rent {
     @Min(0)
     private double rentCost = 0;
 
+    @Version
+    private long version;
+
     public Rent(Client client, Vehicle vehicle, LocalDateTime beginTime) {
         this.client = client;
         this.vehicle = vehicle;
