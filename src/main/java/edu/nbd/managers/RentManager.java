@@ -1,5 +1,6 @@
 package edu.nbd.managers;
 
+import edu.nbd.model.Client;
 import edu.nbd.model.Rent;
 import edu.nbd.repositories.RentRepository;
 
@@ -18,6 +19,15 @@ public class RentManager implements Serializable {
     }
 
     public Rent registerRent(Rent rent) {
+        Client client = rent.getClient();
+        if (client == null) {
+            throw new NullPointerException("Client is null");
+        } else if (client.isArchived()) {
+            throw new IllegalArgumentException("Client is archived");
+        } else if (client.getMaxVehicles() <= rentRepository.countActiveRentsByClient(client)) {
+            throw new IllegalArgumentException("Client has reached the maximum number of vehicles");
+        }
+
         Rent newRent = rentRepository.findById(rent.getId());
         if (newRent != null) {
             rentRepository.update(rent);
@@ -29,10 +39,6 @@ public class RentManager implements Serializable {
 
     public void unregisterRent(Rent rent) {
         if (rent != null) {
-            // zastanowić się nad logiką wyrejestrowania wypożyczenia
-            // jeśli nie ma pola archived to możemy ustawiać endtime który jest równoznaczy
-            // z tym że wypozyczenie zostało zarchwizowane
-            // lub możemy to zrobić w inny sposób
             rent.setEndTime(LocalDateTime.now());
             rentRepository.update(rent);
         }

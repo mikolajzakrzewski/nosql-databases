@@ -1,5 +1,6 @@
 package edu.nbd.repositories;
 
+import edu.nbd.model.Client;
 import edu.nbd.model.Rent;
 import jakarta.persistence.*;
 
@@ -88,6 +89,14 @@ public class RentRepository implements Repository<Rent> {
             return null;
         } finally {
             em.close();
+        }
+    }
+
+    public long countActiveRentsByClient(Client client) {
+        try (EntityManager em = getEntityManager()) {
+            TypedQuery<Long> query = em.createQuery("SELECT COUNT(r) FROM Rent r WHERE r.client = :client AND r.endTime IS NULL", Long.class);
+            query.setParameter("client", client);
+            return query.getSingleResult();
         }
     }
 }
