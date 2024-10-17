@@ -193,7 +193,7 @@ public class RentRepositoryTest {
         Rent rent5 = new Rent(client, motorVehicle, LocalDateTime.now());
         rentRepository.add(rent3);
         rentRepository.add(rent4);
-        // ClientType Gold allows for 5 vehicles, so the fifth rent should not be added
+        // ClientType Gold allows for 4 vehicles, so the fifth rent should not be added
         rentRepository.add(rent5);
         Assertions.assertEquals(rentRepository.countActiveRentsByClient(client), 4);
     }
