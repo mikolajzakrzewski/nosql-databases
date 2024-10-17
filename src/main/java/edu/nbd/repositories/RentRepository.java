@@ -40,7 +40,7 @@ public class RentRepository implements Repository<Rent> {
 
         Client client = rent.getClient();
         if (client.getMaxVehicles() <= countActiveRentsByClient(client)) {
-            return null;
+            throw new IllegalArgumentException("Client already has the maximum number of active rents.");
         }
 
         try {

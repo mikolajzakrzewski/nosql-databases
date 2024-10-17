@@ -181,8 +181,8 @@ public class RentRepositoryTest {
         Rent rent = new Rent(client, motorVehicle, LocalDateTime.now());
         Rent rent2 = new Rent(client, motorVehicle, LocalDateTime.now());
         rentRepository.add(rent);
-        // ClientType Default allows for 1 vehicle, so the second rent should not be added
-        rentRepository.add(rent2);
+        // ClientType Default allows for 1 vehicle, so the second rent should not be added, exception should be thrown
+        Assertions.assertThrows(IllegalArgumentException.class, () -> rentRepository.add(rent2));
         Assertions.assertEquals(rentRepository.countActiveRentsByClient(client), 1);
         client.setClientType(new Gold());
         clientRepository.update(client);
@@ -193,8 +193,8 @@ public class RentRepositoryTest {
         Rent rent5 = new Rent(client, motorVehicle, LocalDateTime.now());
         rentRepository.add(rent3);
         rentRepository.add(rent4);
-        // ClientType Gold allows for 4 vehicles, so the fifth rent should not be added
-        rentRepository.add(rent5);
+        // ClientType Gold allows for 4 vehicles, so the fifth rent should not be added, exception should be thrown
+        Assertions.assertThrows(IllegalArgumentException.class, () -> rentRepository.add(rent5));
         Assertions.assertEquals(rentRepository.countActiveRentsByClient(client), 4);
     }
 }
