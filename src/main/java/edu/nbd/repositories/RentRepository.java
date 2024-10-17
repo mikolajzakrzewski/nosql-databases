@@ -37,6 +37,12 @@ public class RentRepository implements Repository<Rent> {
     public Rent add(Rent rent) {
         EntityManager em = getEntityManager();
         EntityTransaction transaction = em.getTransaction();
+
+        Client client = rent.getClient();
+        if (client.getMaxVehicles() <= countActiveRentsByClient(client)) {
+            return null;
+        }
+
         try {
             transaction.begin();
             em.persist(rent);

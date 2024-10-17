@@ -171,4 +171,30 @@ public class RentRepositoryTest {
         rentRepository.delete(rent);
         Assertions.assertNull(rentRepository.findById(rentID));
     }
+
+    @Test
+    public void countActiveRentsByClient_ClientWithRentsInDB_NumberOfRentsReturned() {
+        Client client = new Client("Firstname", "Lastname", "11111111110", new Default());
+        MotorVehicle motorVehicle = new MotorVehicle("EL12346", 10, 1000);
+        clientRepository.add(client);
+        vehicleRepository.add(motorVehicle);
+        Rent rent = new Rent(client, motorVehicle, LocalDateTime.now());
+        Rent rent2 = new Rent(client, motorVehicle, LocalDateTime.now());
+        rentRepository.add(rent);
+        // ClientType Default allows for 1 vehicle, so the second rent should not be added
+        rentRepository.add(rent2);
+        Assertions.assertEquals(rentRepository.countActiveRentsByClient(client), 1);
+        client.setClientType(new Gold());
+        clientRepository.update(client);
+        rentRepository.add(rent2);
+        Assertions.assertEquals(rentRepository.countActiveRentsByClient(client), 2);
+        Rent rent3 = new Rent(client, motorVehicle, LocalDateTime.now());
+        Rent rent4 = new Rent(client, motorVehicle, LocalDateTime.now());
+        Rent rent5 = new Rent(client, motorVehicle, LocalDateTime.now());
+        rentRepository.add(rent3);
+        rentRepository.add(rent4);
+        // ClientType Gold allows for 5 vehicles, so the fifth rent should not be added
+        rentRepository.add(rent5);
+        Assertions.assertEquals(rentRepository.countActiveRentsByClient(client), 4);
+    }
 }

@@ -19,15 +19,6 @@ public class RentManager implements Serializable {
     }
 
     public Rent registerRent(Rent rent) {
-        Client client = rent.getClient();
-        if (client == null) {
-            throw new NullPointerException("Client is null");
-        } else if (client.isArchived()) {
-            throw new IllegalArgumentException("Client is archived");
-        } else if (client.getMaxVehicles() <= rentRepository.countActiveRentsByClient(client)) {
-            throw new IllegalArgumentException("Client has reached the maximum number of vehicles");
-        }
-
         Rent newRent = rentRepository.findById(rent.getId());
         if (newRent != null) {
             rentRepository.update(rent);
