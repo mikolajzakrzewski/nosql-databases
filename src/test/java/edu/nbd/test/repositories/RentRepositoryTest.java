@@ -125,18 +125,19 @@ public class RentRepositoryTest {
         vehicleRepository.add(bicycle);
         vehicleRepository.add(motorVehicle);
         Rent rent = new Rent(client, bicycle, LocalDateTime.now());
-        Rent rent2 = new Rent(client2, motorVehicle, LocalDateTime.now());
+        Rent rent1;
+        Rent rent2;
         rentRepository.add(rent);
         UUID rentId = rent.getId();
         boolean exceptionThrown = false;
         try (EntityManager em1 = emf.createEntityManager(); EntityManager em2 = emf.createEntityManager()) {
-            rent = em1.find(Rent.class, rentId);
+            rent1 = em1.find(Rent.class, rentId);
             rent2 = em2.find(Rent.class, rentId);
             em1.getTransaction().begin();
             em2.getTransaction().begin();
-            rent.setEndTime(LocalDateTime.now().plusHours(10));
+            rent1.setEndTime(LocalDateTime.now().plusHours(10));
             rent2.setEndTime(LocalDateTime.now().plusHours(20));
-            em1.merge(rent);
+            em1.merge(rent1);
             em2.merge(rent2);
             em1.getTransaction().commit();
             em2.getTransaction().commit();
