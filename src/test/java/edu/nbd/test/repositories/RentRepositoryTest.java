@@ -121,7 +121,7 @@ public class RentRepositoryTest {
         LocalDateTime endTime = LocalDateTime.now().plusHours(10);
         rent.setEndTime(endTime);
         rentRepository.update(rent);
-        Assertions.assertEquals(rentRepository.findById(rentId).getEndTime(), endTime);
+        Assertions.assertEquals(rentRepository.findById(rentId).getEndTime(), endTime.withNano(0));
     }
 
     @Test

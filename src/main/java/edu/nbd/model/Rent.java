@@ -48,7 +48,7 @@ public class Rent {
     public Rent(Client client, Vehicle vehicle, LocalDateTime beginTime) {
         this.client = client;
         this.vehicle = vehicle;
-        this.beginTime = Objects.requireNonNullElseGet(beginTime, LocalDateTime::now);
+        this.beginTime = Objects.requireNonNullElseGet(beginTime, LocalDateTime::now).withNano(0);
     }
 
     public Rent() {
@@ -88,7 +88,7 @@ public class Rent {
             throw new RentException("Rent already ended.");
         }
         if (endRentTime.isAfter(beginTime)) {
-            endTime = endRentTime;
+            endTime = endRentTime.withNano(0);
         } else {
             throw new RentException("Given end rent time should be after the begin time.");
         }
