@@ -2,6 +2,7 @@ package edu.nbd.repositories;
 
 import edu.nbd.model.Client;
 import edu.nbd.model.Rent;
+import edu.nbd.model.Vehicle;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -41,6 +42,9 @@ public class RentRepository implements Repository<Rent> {
         Client client = rent.getClient();
         if (client.getMaxVehicles() <= countActiveRentsByClient(client)) {
             throw new IllegalArgumentException("Client already has the maximum number of active rents.");
+        }
+        if (isVehicleRented(rent.getVehicle())) {
+            throw new IllegalArgumentException("Vehicle is already rented.");
         }
 
         try {
@@ -98,11 +102,19 @@ public class RentRepository implements Repository<Rent> {
         }
     }
 
-    public long countActiveRentsByClient(Client client) {
+    private long countActiveRentsByClient(Client client) {
         try (EntityManager em = getEntityManager()) {
             TypedQuery<Long> query = em.createQuery("SELECT COUNT(r) FROM Rent r WHERE r.client = :client AND r.endTime IS NULL", Long.class);
             query.setParameter("client", client);
             return query.getSingleResult();
+        }
+    }
+
+    private boolean isVehicleRented(Vehicle vehicle) {
+        try (EntityManager em = getEntityManager()) {
+            TypedQuery<Long> query = em.createQuery("SELECT COUNT(r) FROM Rent r WHERE r.vehicle = :vehicle AND r.endTime IS NULL", Long.class);
+            query.setParameter("vehicle", vehicle);
+            return query.getSingleResult() > 0;
         }
     }
 }

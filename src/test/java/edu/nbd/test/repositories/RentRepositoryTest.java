@@ -163,28 +163,70 @@ public class RentRepositoryTest {
     }
 
     @Test
-    public void countActiveRentsByClient_ClientWithRentsInDB_NumberOfRentsReturned() {
+    public void countActiveRentsByClient_ClientWithRentsInDB_IllegalArgumentExceptionThrown() {
         Client client = new Client("Firstname", "Lastname", "11111111110", new Default());
-        MotorVehicle motorVehicle = new MotorVehicle("EL12346", 10, 1000);
+        MotorVehicle motorVehicle = new MotorVehicle("EL12345", 10, 1000);
+        MotorVehicle motorVehicle2 = new MotorVehicle("EL12346", 10, 1000);
         clientRepository.add(client);
         vehicleRepository.add(motorVehicle);
+        vehicleRepository.add(motorVehicle2);
         Rent rent = new Rent(client, motorVehicle, LocalDateTime.now());
-        Rent rent2 = new Rent(client, motorVehicle, LocalDateTime.now());
+        Rent rent2 = new Rent(client, motorVehicle2, LocalDateTime.now());
         rentRepository.add(rent);
         // ClientType Default allows for 1 vehicle, so the second rent should not be added, exception should be thrown
         Assertions.assertThrows(IllegalArgumentException.class, () -> rentRepository.add(rent2));
-        Assertions.assertEquals(rentRepository.countActiveRentsByClient(client), 1);
         client.setClientType(new Gold());
         clientRepository.update(client);
         rentRepository.add(rent2);
-        Assertions.assertEquals(rentRepository.countActiveRentsByClient(client), 2);
-        Rent rent3 = new Rent(client, motorVehicle, LocalDateTime.now());
-        Rent rent4 = new Rent(client, motorVehicle, LocalDateTime.now());
-        Rent rent5 = new Rent(client, motorVehicle, LocalDateTime.now());
+        MotorVehicle motorVehicle3 = new MotorVehicle("EL12347", 10, 1000);
+        Rent rent3 = new Rent(client, motorVehicle3, LocalDateTime.now());
+        MotorVehicle motorVehicle4 = new MotorVehicle("EL12348", 10, 1000);
+        Rent rent4 = new Rent(client, motorVehicle4, LocalDateTime.now());
+        MotorVehicle motorVehicle5 = new MotorVehicle("EL12349", 10, 1000);
+        Rent rent5 = new Rent(client, motorVehicle5, LocalDateTime.now());
+        vehicleRepository.add(motorVehicle3);
+        vehicleRepository.add(motorVehicle4);
+        vehicleRepository.add(motorVehicle5);
         rentRepository.add(rent3);
         rentRepository.add(rent4);
         // ClientType Gold allows for 4 vehicles, so the fifth rent should not be added, exception should be thrown
         Assertions.assertThrows(IllegalArgumentException.class, () -> rentRepository.add(rent5));
-        Assertions.assertEquals(rentRepository.countActiveRentsByClient(client), 4);
+    }
+
+    @Test
+    void isVehicleRented_SameVehicleRentedTwoTimes_IllegalArgumentExceptionThrown() {
+        Client client = new Client("Firstname", "Lastname", "11111111110", new Gold());
+        MotorVehicle motorVehicle = new MotorVehicle("EL12345", 10, 1000);
+        clientRepository.add(client);
+        vehicleRepository.add(motorVehicle);
+        Rent rent = new Rent(client, motorVehicle, LocalDateTime.now());
+        rentRepository.add(rent);
+        Rent rent2 = new Rent(client, motorVehicle, LocalDateTime.now());
+        // Vehicle is already rented, exception should be thrown
+        Assertions.assertThrows(IllegalArgumentException.class, () -> rentRepository.add(rent2));
+        Client client2 = new Client("Firstname", "Lastname", "11111111110", new Default());
+        clientRepository.add(client2);
+        Rent rent3 = new Rent(client2, motorVehicle, LocalDateTime.now());
+        // Other client test - vehicle is already rented, exception should be thrown
+        Assertions.assertThrows(IllegalArgumentException.class, () -> rentRepository.add(rent3));
+    }
+
+    @Test
+    void isVehicleRented_EndTimeNotNull_VehicleNotRented() {
+        Client client = new Client("Firstname", "Lastname", "11111111110", new Gold());
+        MotorVehicle motorVehicle = new MotorVehicle("EL12345", 10, 1000);
+        clientRepository.add(client);
+        vehicleRepository.add(motorVehicle);
+        Rent rent = new Rent(client, motorVehicle, LocalDateTime.now());
+        rentRepository.add(rent);
+        UUID rentID = rent.getId();
+        Assertions.assertNotNull(rentRepository.findById(rentID));
+        Rent rent2 = new Rent(client, motorVehicle, LocalDateTime.now());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> rentRepository.add(rent2));
+        rent.setEndTime(LocalDateTime.now().plusHours(10));
+        rentRepository.update(rent);
+        rentRepository.add(rent2);
+        UUID rentID2 = rent2.getId();
+        Assertions.assertNotNull(rentRepository.findById(rentID2));
     }
 }
