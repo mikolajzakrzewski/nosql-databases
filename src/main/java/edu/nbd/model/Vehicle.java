@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Entity
+@Table(name = "vehicles")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class Vehicle {
 

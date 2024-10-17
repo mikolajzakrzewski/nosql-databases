@@ -22,7 +22,7 @@ public class ClientRepositoryTest {
         clientRepository = new ClientRepository(emf);
     }
 
-    @BeforeEach
+    @AfterEach
     void clearDatabase() {
         try (EntityManager em = emf.createEntityManager()) {
             em.getTransaction().begin();
@@ -33,11 +33,6 @@ public class ClientRepositoryTest {
 
     @AfterAll
     static void tearDown() {
-        try (EntityManager em = emf.createEntityManager()) {
-            em.getTransaction().begin();
-            em.createQuery("DELETE FROM Client c").executeUpdate();
-            em.getTransaction().commit();
-        }
         emf.close();
     }
 

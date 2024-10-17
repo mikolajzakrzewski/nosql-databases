@@ -28,7 +28,7 @@ public class RentRepositoryTest {
         rentRepository = new RentRepository(emf);
     }
 
-    @BeforeEach
+    @AfterEach
     void clearDatabase() {
         try (EntityManager em = emf.createEntityManager()) {
             em.getTransaction().begin();
@@ -41,13 +41,6 @@ public class RentRepositoryTest {
 
     @AfterAll
     static void tearDown() {
-        try (EntityManager em = emf.createEntityManager()) {
-            em.getTransaction().begin();
-            em.createQuery("DELETE FROM Rent r").executeUpdate();
-            em.createQuery("DELETE FROM Vehicle v").executeUpdate();
-            em.createQuery("DELETE FROM Client c").executeUpdate();
-            em.getTransaction().commit();
-        }
         emf.close();
     }
 
@@ -81,9 +74,6 @@ public class RentRepositoryTest {
         Rent rent2 = new Rent(client2, motorVehicle, LocalDateTime.now());
         rentRepository.add(rent);
         rentRepository.add(rent2);
-        for (Vehicle vehicle : vehicleRepository.findAll()) {
-            System.out.println(vehicle.getId().toString());
-        }
         List<Rent> addedRents = List.of(rent, rent2);
         List<Rent> foundRents = rentRepository.findAll();
         Assertions.assertEquals(foundRents.size(), 2);

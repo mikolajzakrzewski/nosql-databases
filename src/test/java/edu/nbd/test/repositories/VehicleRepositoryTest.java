@@ -21,7 +21,7 @@ public class VehicleRepositoryTest {
         vehicleRepository = new VehicleRepository(emf);
     }
 
-    @BeforeEach
+    @AfterEach
     void clearDatabase() {
         try (EntityManager em = emf.createEntityManager()) {
             em.getTransaction().begin();
@@ -32,11 +32,6 @@ public class VehicleRepositoryTest {
 
     @AfterAll
     static void tearDown() {
-        try (EntityManager em = emf.createEntityManager()) {
-            em.getTransaction().begin();
-            em.createQuery("DELETE FROM Vehicle v").executeUpdate();
-            em.getTransaction().commit();
-        }
         emf.close();
     }
 
@@ -45,7 +40,6 @@ public class VehicleRepositoryTest {
         Bicycle bicycle = new Bicycle("EL12345", 10);
         vehicleRepository.add(bicycle);
         UUID bicycleId = bicycle.getId();
-        System.out.println(bicycleId.toString());
         Vehicle foundBicycle;
         try (EntityManager em = emf.createEntityManager()) {
             foundBicycle = em.find(Vehicle.class, bicycleId);
