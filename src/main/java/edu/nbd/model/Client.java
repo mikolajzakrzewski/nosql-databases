@@ -1,33 +1,45 @@
 package edu.nbd.model;
 
 import edu.nbd.exceptions.ClientException;
+import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 
 public class Client {
 
+    @BsonId
     private String personalID;
 
+    @BsonProperty("firstName")
     private String firstName;
 
+    @BsonProperty("lastName")
     private String lastName;
 
+    @BsonProperty("clientType")
     private ClientType clientType;
 
-    private boolean archived = false;
-
-    public Client(String firstName, String lastName, String personalID, ClientType clientType) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.personalID = personalID;
-        this.clientType = clientType;
-    }
+    @BsonProperty("archived")
+    private boolean archived;
 
     public Client() {
-
     }
 
-    public String getClientInfo() {
-        String className = "Client";
-        return className + firstName + lastName + personalID + clientType.getTypeInfo();
+    @BsonCreator
+    public Client(@BsonProperty("personalID") String personalID,
+                  @BsonProperty("firstName") String firstName,
+                  @BsonProperty("lastName") String lastName,
+                  @BsonProperty("clientType") ClientType clientType) {
+        this.personalID = personalID;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.clientType = clientType;
+        this.archived = false;
+    }
+
+    public String getPersonalID() {
+        return personalID;
     }
 
     public String getFirstName() {
@@ -54,8 +66,8 @@ public class Client {
         }
     }
 
-    public String getPersonalID() {
-        return personalID;
+    public ClientType getClientType() {
+        return clientType;
     }
 
     public void setClientType(ClientType clientType) {
@@ -66,14 +78,6 @@ public class Client {
         }
     }
 
-    public int getMaxVehicles() {
-        return clientType.getMaxVehicles();
-    }
-
-    public double applyDiscount(double price) {
-        return clientType.applyDiscount(price);
-    }
-
     public boolean isArchived() {
         return archived;
     }
@@ -82,19 +86,33 @@ public class Client {
         this.archived = archived;
     }
 
+    @BsonIgnore
+    public int getMaxVehicles() {
+        return clientType.getMaxVehicles();
+    }
+
+    @BsonIgnore
+    public String getClientInfo() {
+        String className = "Client";
+        return className + firstName + lastName + personalID + clientType.getTypeInfo();
+    }
+
+    @BsonIgnore
     public String getInfo() {
         return getClientInfo();
     }
 
-    public ClientType getClientType() {
-        return clientType;
-    }
-
+    @BsonIgnore
     public String getTypeInfo() {
         return clientType.getClass().getSimpleName();
     }
 
+    @BsonIgnore
     public String getId() {
         return getPersonalID();
+    }
+
+    public double applyDiscount(double price) {
+        return clientType.applyDiscount(price);
     }
 }

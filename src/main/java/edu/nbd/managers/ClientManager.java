@@ -6,7 +6,7 @@ import edu.nbd.repositories.ClientRepository;
 import java.io.Serializable;
 
 public class ClientManager implements Serializable {
-    private ClientRepository clientRepository;
+    private final ClientRepository clientRepository;
 
     public ClientManager(ClientRepository clientRepository) {
         if (clientRepository == null) {
