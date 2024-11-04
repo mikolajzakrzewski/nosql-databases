@@ -1,16 +1,22 @@
 package edu.nbd.model;
 
+import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonProperty;
+
 public class MotorVehicle extends Vehicle {
 
+    @BsonProperty("engineDisplacement")
     private int engineDisplacement;
 
-    public MotorVehicle(String plateNumber, int basePrice, int engineDisplacement) {
+    @BsonCreator
+    public MotorVehicle(@BsonProperty("plateNumber") String plateNumber,
+                        @BsonProperty("basePrice") int basePrice,
+                        @BsonProperty("engineDisplacement") int engineDisplacement) {
         super(plateNumber, basePrice);
         this.engineDisplacement = engineDisplacement;
     }
 
     public MotorVehicle() {
-
     }
 
     @Override

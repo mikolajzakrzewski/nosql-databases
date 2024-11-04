@@ -1,28 +1,36 @@
 package edu.nbd.model;
 
 import edu.nbd.exceptions.VehicleException;
-
-import java.util.UUID;
+import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 
 public abstract class Vehicle {
 
-    private UUID id;
+    @BsonId
+    private String id;
 
+    @BsonProperty("plateNumber")
     private String plateNumber;
 
+    @BsonProperty("basePrice")
     private int basePrice;
 
+    @BsonProperty("archived")
     private boolean archived = false;
 
     public Vehicle() {
-
     }
 
-    public Vehicle(String plateNumber, int basePrice) {
+    @BsonCreator
+    public Vehicle(@BsonProperty("plateNumber") String plateNumber,
+                   @BsonProperty("basePrice") int basePrice) {
         this.plateNumber = plateNumber;
         this.basePrice = basePrice;
     }
 
+    @BsonIgnore
     public String getVehicleInfo() {
         return plateNumber + basePrice;
     }
@@ -63,11 +71,13 @@ public abstract class Vehicle {
         this.archived = archived;
     }
 
+    @BsonIgnore
     public String getInfo() {
         return getVehicleInfo();
     }
 
-    public UUID getId() {
+    @BsonIgnore
+    public String getId() {
         return this.id;
     }
 }

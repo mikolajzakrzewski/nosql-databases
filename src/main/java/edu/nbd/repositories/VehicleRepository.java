@@ -1,28 +1,47 @@
 package edu.nbd.repositories;
 
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import edu.nbd.model.Vehicle;
+import org.bson.conversions.Bson;
 
-import java.util.List;
+import java.util.ArrayList;
 
-public class VehicleRepository {
+public class VehicleRepository extends AbstractMongoRepository {
 
     public Vehicle findById(Object id) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        Bson filter = Filters.eq("_id", id);
+        MongoCollection<Vehicle> collection = getDatabase().getCollection("vehicles", Vehicle.class);
+        FindIterable<Vehicle> vehicles = collection.find(filter);
+        return vehicles.first();
     }
 
-    public List<Vehicle> findAll() {
-        throw new UnsupportedOperationException("Not implemented yet");
+    public ArrayList<Vehicle> findAll() {
+        MongoCollection<Vehicle> collection = getDatabase().getCollection("vehicles", Vehicle.class);
+        return collection.find().into(new ArrayList<>());
     }
 
-    public Vehicle add(Vehicle vehicle) {
-        throw new UnsupportedOperationException("Not implemented yet");
+    public void add(Vehicle vehicle) {
+        MongoCollection<Vehicle> collection = getDatabase().getCollection("vehicles", Vehicle.class);
+        collection.insertOne(vehicle);
     }
 
-    public Vehicle update(Vehicle vehicle) {
-        throw new UnsupportedOperationException("Not implemented yet");
+    public void update(Vehicle vehicle) {
+        Bson filter = Filters.eq("_id", vehicle.getId());
+        MongoCollection<Vehicle> collection = getDatabase().getCollection("vehicles", Vehicle.class);
+        Bson updates = Updates.combine(
+                Updates.set("plateNumber", vehicle.getPlateNumber()),
+                Updates.set("basePrice", vehicle.getBasePrice()),
+                Updates.set("archived", vehicle.isArchived())
+        );
+        collection.findOneAndUpdate(filter, updates);
     }
 
-    public Vehicle delete(Vehicle vehicle) {
-        throw new UnsupportedOperationException("Not implemented yet");
+    public void delete(Vehicle vehicle) {
+        Bson filter = Filters.eq("_id", vehicle.getId());
+        MongoCollection<Vehicle> collection = getDatabase().getCollection("vehicles", Vehicle.class);
+        collection.findOneAndDelete(filter);
     }
 }
