@@ -39,7 +39,8 @@ public class MotorVehicle extends Vehicle {
 
     @Override
     public String getVehicleInfo() {
-        return super.getVehicleInfo() + engineDisplacement;
+        String className = "MotorVehicle";
+        return className + super.getVehicleInfo() + engineDisplacement;
     }
 
     public int getEngineDisplacement() {

@@ -7,6 +7,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import edu.nbd.model.ClientTypeCodec;
+import edu.nbd.model.VehicleCodec;
 import org.bson.UuidRepresentation;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
@@ -20,7 +21,7 @@ public abstract class AbstractMongoRepository implements AutoCloseable {
 
     private CodecRegistry pojoCodecRegistry = CodecRegistries.fromRegistries(
             MongoClientSettings.getDefaultCodecRegistry(),
-            CodecRegistries.fromCodecs(new ClientTypeCodec()),
+            CodecRegistries.fromCodecs(new ClientTypeCodec(), new VehicleCodec()),
             CodecRegistries.fromProviders(
                 PojoCodecProvider.builder()
                         .automatic(true)

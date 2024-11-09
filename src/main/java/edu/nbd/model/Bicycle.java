@@ -11,6 +11,12 @@ public class Bicycle extends Vehicle {
         super(plateNumber, basePrice);
     }
 
+    @Override
+    public String getVehicleInfo() {
+        String className = "Bicycle";
+        return className + super.getVehicleInfo();
+    }
+
     public Bicycle() {
 
     }

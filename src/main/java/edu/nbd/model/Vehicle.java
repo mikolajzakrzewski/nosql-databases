@@ -7,11 +7,7 @@ import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
 public abstract class Vehicle {
-
     @BsonId
-    private String id;
-
-    @BsonProperty("plateNumber")
     private String plateNumber;
 
     @BsonProperty("basePrice")
@@ -28,6 +24,7 @@ public abstract class Vehicle {
                    @BsonProperty("basePrice") int basePrice) {
         this.plateNumber = plateNumber;
         this.basePrice = basePrice;
+        this.archived = false;
     }
 
     @BsonIgnore
@@ -78,6 +75,6 @@ public abstract class Vehicle {
 
     @BsonIgnore
     public String getId() {
-        return this.id;
+        return getPlateNumber();
     }
 }
