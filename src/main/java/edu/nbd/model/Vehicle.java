@@ -1,11 +1,9 @@
 package edu.nbd.model;
 
 import edu.nbd.exceptions.VehicleException;
-import org.bson.codecs.pojo.annotations.BsonCreator;
-import org.bson.codecs.pojo.annotations.BsonId;
-import org.bson.codecs.pojo.annotations.BsonIgnore;
-import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.codecs.pojo.annotations.*;
 
+@BsonDiscriminator(key = "_type")
 public abstract class Vehicle {
     @BsonId
     private String plateNumber;

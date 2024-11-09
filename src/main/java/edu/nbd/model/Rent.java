@@ -2,26 +2,40 @@ package edu.nbd.model;
 
 
 import edu.nbd.exceptions.RentException;
+import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonId;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.UUID;
 
 public class Rent {
 
-    private UUID id;
+    @BsonId
+    private long id;
 
+    @BsonProperty("client")
     private Client client;
 
+    @BsonProperty("vehicle")
     private Vehicle vehicle;
 
+    @BsonProperty("beginTime")
     private LocalDateTime beginTime;
 
+    @BsonProperty("endTime")
     private LocalDateTime endTime;
 
+    @BsonProperty("rentCost")
     private double rentCost = 0;
 
-    public Rent(Client client, Vehicle vehicle, LocalDateTime beginTime) {
+    @BsonCreator
+    public Rent(@BsonProperty("id") long id,
+                @BsonProperty("client") Client client,
+                @BsonProperty("vehicle") Vehicle vehicle,
+                @BsonProperty("beginTime") LocalDateTime beginTime) {
+        this.id = id;
         this.client = client;
         this.vehicle = vehicle;
         this.beginTime = Objects.requireNonNullElseGet(beginTime, LocalDateTime::now).withNano(0);
@@ -31,15 +45,18 @@ public class Rent {
 
     }
 
+    @BsonIgnore
     public String getRentInfo() {
-        return id.toString() +
+        String className = "Rent";
+        return className + id +
                 client.getClientInfo() +
                 vehicle.getVehicleInfo() +
                 beginTime.toString() +
                 (endTime != null ? endTime.toString() : "current");
     }
 
-    public UUID getId() {
+    @BsonIgnore
+    public long getId() {
         return id;
     }
 

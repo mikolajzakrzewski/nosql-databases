@@ -1,8 +1,10 @@
 package edu.nbd.model;
 
 import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
+@BsonDiscriminator(key = "_type", value = "bicycle")
 public class Bicycle extends Vehicle {
 
     @BsonCreator
