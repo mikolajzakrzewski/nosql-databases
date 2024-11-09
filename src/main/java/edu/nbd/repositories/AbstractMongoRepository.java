@@ -14,21 +14,18 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.Conventions;
 import org.bson.codecs.pojo.PojoCodecProvider;
 
+import java.util.List;
+
 public abstract class AbstractMongoRepository implements AutoCloseable {
 
-    private ConnectionString connectionString = new ConnectionString("mongodb://mongodb1:27017,mongodb2:27017,mongodb3:27017/?replicaSet=replica_set_single");
+    private ConnectionString connectionString = new ConnectionString("mongodb://mongodb1:27017,mongodb2:27018,mongodb3:27019/?replicaSet=replica_set_single");
     private MongoCredential credential = MongoCredential.createCredential("nbd", "admin", "nbdpassword".toCharArray());
 
-    private CodecRegistry pojoCodecRegistry = CodecRegistries.fromRegistries(
-            MongoClientSettings.getDefaultCodecRegistry(),
-            CodecRegistries.fromCodecs(new ClientTypeCodec(), new VehicleCodec()),
-            CodecRegistries.fromProviders(
-                PojoCodecProvider.builder()
-                        .automatic(true)
-                        .conventions(Conventions.DEFAULT_CONVENTIONS)
-                        .build()
-            )
-    );
+    private CodecRegistry pojoCodecRegistry = CodecRegistries.fromProviders(
+            PojoCodecProvider.builder()
+                    .automatic(true)
+                    .conventions(List.of(Conventions.ANNOTATION_CONVENTION))
+                    .build());
 
     private MongoClient mongoClient;
     private MongoDatabase database;
@@ -38,7 +35,11 @@ public abstract class AbstractMongoRepository implements AutoCloseable {
                 .credential(credential)
                 .applyConnectionString(connectionString)
                 .uuidRepresentation(UuidRepresentation.STANDARD)
-                .codecRegistry(pojoCodecRegistry)
+                .codecRegistry(CodecRegistries.fromRegistries(
+                        MongoClientSettings.getDefaultCodecRegistry(),
+                        CodecRegistries.fromCodecs(new ClientTypeCodec(), new VehicleCodec()),
+                        pojoCodecRegistry
+                ))
                 .build();
 
         mongoClient = MongoClients.create(settings);
