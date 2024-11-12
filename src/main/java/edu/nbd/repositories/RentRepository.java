@@ -28,12 +28,12 @@ public class RentRepository extends AbstractMongoRepository {
     public void add(Rent rent) {
         if (rent == null) {
             throw new NullPointerException("Rent is null");
-        }
-        if (rent.getClient() == null) {
+        } else if (rent.getClient() == null) {
             throw new NullPointerException("Client is null");
-        }
-        if (rent.getVehicle() == null) {
+        } else if (rent.getVehicle() == null) {
             throw new NullPointerException("Vehicle is null");
+        } else if (rent.getClient().getMaxVehicles() <= countActiveRentsByClient(rent.getClient())) {
+            throw new IllegalArgumentException("Client has rented the maximum number of vehicles");
         }
         MongoCollection<Rent> collection = getDatabase().getCollection("rents", Rent.class);
         collection.insertOne(rent);
@@ -55,11 +55,16 @@ public class RentRepository extends AbstractMongoRepository {
     public void delete(Rent rent) {
         Bson filter = Filters.eq("_id", rent.getId());
         MongoCollection<Rent> collection = getDatabase().getCollection("rents", Rent.class);
-        collection.findOneAndDelete(filter);;
+        collection.findOneAndDelete(filter);
     }
 
     private long countActiveRentsByClient(Client client) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        Bson filter = Filters.and(
+                Filters.eq("client", client),
+                Filters.eq("endTime", null)
+        );
+        MongoCollection<Rent> collection = getDatabase().getCollection("rents", Rent.class);
+        return collection.countDocuments(filter);
     }
 
     private boolean isVehicleRented(Vehicle vehicle) {
