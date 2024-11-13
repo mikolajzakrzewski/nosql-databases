@@ -6,6 +6,10 @@ import com.mongodb.MongoCredential;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.CreateCollectionOptions;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.ValidationAction;
+import com.mongodb.client.model.ValidationOptions;
 import edu.nbd.model.ClientTypeCodec;
 import edu.nbd.model.VehicleCodec;
 import org.bson.UuidRepresentation;
@@ -44,6 +48,27 @@ public abstract class AbstractMongoRepository implements AutoCloseable {
 
         mongoClient = MongoClients.create(settings);
         database = mongoClient.getDatabase("nbddb");
+        getDatabase().getCollection("vehicles", VehicleCodec.class).drop();
+        ValidationOptions validationOptions = new ValidationOptions().validator(
+                Filters.and(
+                        Filters.type("_id", "string"),
+                        Filters.type("basePrice", "int"),
+                        Filters.type("archived", "bool"),
+                        Filters.gte("basePrice", 0),
+                        Filters.type("rented", "int"),
+                        Filters.lte("rented", 1),
+                        Filters.gte("rented", 0)
+                )
+        ).validationAction(ValidationAction.ERROR);
+        CreateCollectionOptions createCollectionOptions = new CreateCollectionOptions().validationOptions(validationOptions);
+        getDatabase().createCollection("vehicles", createCollectionOptions);
+    }
+
+    public MongoClient getMongoClient() {
+        if (mongoClient == null) {
+            initDbConnection();
+        }
+        return mongoClient;
     }
 
     public MongoDatabase getDatabase() {

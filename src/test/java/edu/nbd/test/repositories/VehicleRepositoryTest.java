@@ -4,6 +4,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import edu.nbd.model.*;
 import edu.nbd.repositories.VehicleRepository;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.junit.jupiter.api.*;
 
@@ -14,12 +15,12 @@ public class VehicleRepositoryTest {
 
     @BeforeEach
     public void setUp() {
-        vehicleRepository.getDatabase().getCollection("vehicles", Vehicle.class).drop();
+        vehicleRepository.getDatabase().getCollection("vehicles", Vehicle.class).deleteMany(new Document());
     }
 
     @AfterAll
     public static void tearDown() {
-        vehicleRepository.getDatabase().getCollection("vehicles", Vehicle.class).drop();
+        vehicleRepository.getDatabase().getCollection("vehicles", Vehicle.class).deleteMany(new Document());
         vehicleRepository.close();
     }
 

@@ -6,6 +6,7 @@ import edu.nbd.model.Client;
 import edu.nbd.model.Default;
 import edu.nbd.model.Gold;
 import edu.nbd.repositories.ClientRepository;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.junit.jupiter.api.*;
 
@@ -17,12 +18,12 @@ public class ClientRepositoryTest {
 
     @BeforeEach
     public void setUp() {
-        clientRepository.getDatabase().getCollection("clients", Client.class).drop();
+        clientRepository.getDatabase().getCollection("clients", Client.class).deleteMany(new Document());
     }
 
     @AfterAll
     public static void tearDown() {
-        clientRepository.getDatabase().getCollection("clients", Client.class).drop();
+        clientRepository.getDatabase().getCollection("clients", Client.class).deleteMany(new Document());
         clientRepository.close();
     }
 

@@ -24,6 +24,7 @@ public class VehicleCodec implements Codec<Vehicle> {
         writer.writeString("_id", vehicle.getPlateNumber());
         writer.writeInt32("basePrice", vehicle.getBasePrice());
         writer.writeBoolean("archived", vehicle.isArchived());
+        writer.writeInt32("rented", vehicle.getRented());
 
         if (vehicle instanceof MotorVehicle) {
             writer.writeInt32("engineDisplacement", ((MotorVehicle) vehicle).getEngineDisplacement());
@@ -40,6 +41,7 @@ public class VehicleCodec implements Codec<Vehicle> {
         String plateNumber = null;
         int basePrice = 0;
         boolean archived = false;
+        int rented = 0;
         int engineDisplacement = 0;
 
         while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
@@ -52,6 +54,8 @@ public class VehicleCodec implements Codec<Vehicle> {
                 basePrice = reader.readInt32();
             } else if (fieldName.equals("archived")) {
                 archived = reader.readBoolean();
+            } else if (fieldName.equals("rented")) {
+                rented = reader.readInt32();
             } else if (fieldName.equals("engineDisplacement") && Objects.equals(type, "motorVehicle")) {
                 engineDisplacement = reader.readInt32();
             } else {
