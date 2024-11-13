@@ -1,10 +1,12 @@
 package edu.nbd.test.repositories;
 
+import com.mongodb.MongoWriteException;
 import com.mongodb.client.model.Filters;
 import edu.nbd.model.*;
 import edu.nbd.repositories.ClientRepository;
 import edu.nbd.repositories.RentRepository;
 import edu.nbd.repositories.VehicleRepository;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.junit.jupiter.api.*;
 
@@ -19,16 +21,16 @@ public class RentRepositoryTest {
 
     @BeforeEach
     public void setUp() {
-        clientRepository.getDatabase().getCollection("clients", Client.class).drop();
-        vehicleRepository.getDatabase().getCollection("vehicles", Vehicle.class).drop();
-        rentRepository.getDatabase().getCollection("rents", Rent.class).drop();
+        clientRepository.getDatabase().getCollection("clients", Client.class).deleteMany(new Document());
+        vehicleRepository.getDatabase().getCollection("vehicles", Vehicle.class).deleteMany(new Document());
+        rentRepository.getDatabase().getCollection("rents", Rent.class).deleteMany(new Document());
     }
 
     @AfterAll
     public static void tearDown() {
-        clientRepository.getDatabase().getCollection("clients", Client.class).drop();
-        vehicleRepository.getDatabase().getCollection("vehicles", Vehicle.class).drop();
-        rentRepository.getDatabase().getCollection("rents", Rent.class).drop();
+        clientRepository.getDatabase().getCollection("clients", Client.class).deleteMany(new Document());
+        vehicleRepository.getDatabase().getCollection("vehicles", Vehicle.class).deleteMany(new Document());
+        rentRepository.getDatabase().getCollection("rents", Rent.class).deleteMany(new Document());
         clientRepository.close();
         vehicleRepository.close();
         rentRepository.close();
@@ -113,5 +115,22 @@ public class RentRepositoryTest {
 
         // ClientType Default allows for 1 vehicle, so the second rent should not be added, exception should be thrown
         Assertions.assertThrows(IllegalArgumentException.class, () -> rentRepository.add(rent2));
+    }
+
+    @Test
+    public void add_SameVehicleRentedTwice_MongoWriteExceptionThrown() {
+        Client client = new Client("11111111110", "Firstname", "Lastname", new Default());
+        Client client2 = new Client("11111111111", "Firstname", "Lastname", new Default());
+        MotorVehicle motorVehicle = new MotorVehicle("EL12346", 10, 1000);
+        Rent rent = new Rent(10000, client, motorVehicle, LocalDateTime.now());
+        vehicleRepository.add(motorVehicle);
+        rentRepository.add(rent);
+        Rent rent2 = new Rent(10001, client2, motorVehicle, LocalDateTime.now());
+        Assertions.assertThrows(MongoWriteException.class, () -> rentRepository.add(rent2));
+
+        // End the first rent and try to add the second rent again
+        rent.setEndTime(LocalDateTime.now().plusHours(10));
+        rentRepository.update(rent);
+        Assertions.assertDoesNotThrow(() -> rentRepository.add(rent2));
     }
 }

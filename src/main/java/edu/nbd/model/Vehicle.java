@@ -14,6 +14,9 @@ public abstract class Vehicle {
     @BsonProperty("archived")
     private boolean archived = false;
 
+    @BsonProperty("rented")
+    private int rented = 0;
+
     public Vehicle() {
     }
 
@@ -23,6 +26,7 @@ public abstract class Vehicle {
         this.plateNumber = plateNumber;
         this.basePrice = basePrice;
         this.archived = false;
+        this.rented = 0;
     }
 
     @BsonIgnore
@@ -64,6 +68,10 @@ public abstract class Vehicle {
 
     public void setArchived(boolean archived) {
         this.archived = archived;
+    }
+
+    public int getRented() {
+        return rented;
     }
 
     @BsonIgnore
