@@ -23,6 +23,9 @@ public class Client {
     @BsonProperty("archived")
     private boolean archived;
 
+    @BsonProperty("currentRentsNumber")
+    private int currentRentsNumber;
+
     public Client() {
     }
 
@@ -36,6 +39,7 @@ public class Client {
         this.lastName = lastName;
         this.clientType = clientType;
         this.archived = false;
+        this.currentRentsNumber = 0;
     }
 
     public String getPersonalID() {
@@ -84,6 +88,10 @@ public class Client {
 
     public void setArchived(boolean archived) {
         this.archived = archived;
+    }
+
+    public int getCurrentRentsNumber() {
+        return currentRentsNumber;
     }
 
     @BsonIgnore

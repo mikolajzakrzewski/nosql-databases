@@ -33,8 +33,6 @@ public class RentRepository extends AbstractMongoRepository {
             throw new NullPointerException("Client is null");
         } else if (rent.getVehicle() == null) {
             throw new NullPointerException("Vehicle is null");
-        } else if (rent.getClient().getMaxVehicles() <= countActiveRentsByClient(rent.getClient())) {
-            throw new IllegalArgumentException("Client has rented the maximum number of vehicles");
         }
         ClientSession clientSession = getMongoClient().startSession();
         try {
@@ -47,6 +45,11 @@ public class RentRepository extends AbstractMongoRepository {
             Bson filter = Filters.eq("_id", rent.getVehicle().getId());
             Bson updates = Updates.inc("rented", 1);
             vehiclesCollection.updateOne(clientSession, filter, updates);
+
+            MongoCollection<Client> clientsCollection = getDatabase().getCollection("clients", Client.class);
+            Bson clientFilter = Filters.eq("_id", rent.getClient().getId());
+            Bson clientUpdates = Updates.inc("currentRentsNumber", 1);
+            clientsCollection.updateOne(clientSession, clientFilter, clientUpdates);
 
             clientSession.commitTransaction();
         } catch (Exception e) {
@@ -78,6 +81,11 @@ public class RentRepository extends AbstractMongoRepository {
                 Bson vehicleFilter = Filters.eq("_id", rent.getVehicle().getId());
                 Bson vehicleUpdates = Updates.inc("rented", -1);
                 vehiclesCollection.updateOne(clientSession, vehicleFilter, vehicleUpdates);
+
+                MongoCollection<Client> clientsCollection = getDatabase().getCollection("clients", Client.class);
+                Bson clientFilter = Filters.eq("_id", rent.getClient().getId());
+                Bson clientUpdates = Updates.inc("currentRentsNumber", -1);
+                clientsCollection.updateOne(clientSession, clientFilter, clientUpdates);
             }
 
             clientSession.commitTransaction();
@@ -103,6 +111,11 @@ public class RentRepository extends AbstractMongoRepository {
                 Bson vehicleFilter = Filters.eq("_id", rent.getVehicle().getId());
                 Bson updates = Updates.inc("rented", -1);
                 vehiclesCollection.updateOne(clientSession, vehicleFilter, updates);
+
+                MongoCollection<Client> clientsCollection = getDatabase().getCollection("clients", Client.class);
+                Bson clientFilter = Filters.eq("_id", rent.getClient().getId());
+                Bson clientUpdates = Updates.inc("currentRentsNumber", -1);
+                clientsCollection.updateOne(clientSession, clientFilter, clientUpdates);
             }
 
             clientSession.commitTransaction();
@@ -112,14 +125,5 @@ public class RentRepository extends AbstractMongoRepository {
         } finally {
             clientSession.close();
         }
-    }
-
-    private long countActiveRentsByClient(Client client) {
-        Bson filter = Filters.and(
-                Filters.eq("client", client),
-                Filters.eq("endTime", null)
-        );
-        MongoCollection<Rent> collection = getDatabase().getCollection("rents", Rent.class);
-        return collection.countDocuments(filter);
     }
 }

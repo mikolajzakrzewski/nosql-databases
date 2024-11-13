@@ -105,16 +105,22 @@ public class RentRepositoryTest {
     }
 
     @Test
-    public void countActiveRentsByClient_ClientWithRentsInDB_IllegalArgumentExceptionThrown() {
+    public void countActiveRentsByClient_ClientRentsMoreVehiclesThanAllowed_MongoWriteExceptionThrown() {
         Client client = new Client("11111111110", "Firstname", "Lastname", new Default());
         MotorVehicle motorVehicle = new MotorVehicle("EL12346", 10, 1000);
         MotorVehicle motorVehicle2 = new MotorVehicle("EL12347", 10, 1000);
         Rent rent = new Rent(10000, client, motorVehicle, LocalDateTime.now());
         Rent rent2 = new Rent(10001, client, motorVehicle2, LocalDateTime.now());
+        clientRepository.add(client);
         rentRepository.add(rent);
 
         // ClientType Default allows for 1 vehicle, so the second rent should not be added, exception should be thrown
-        Assertions.assertThrows(IllegalArgumentException.class, () -> rentRepository.add(rent2));
+        Assertions.assertThrows(MongoWriteException.class, () -> rentRepository.add(rent2));
+
+        // Change the client type to Gold and try again
+        client.setClientType(new Gold());
+        clientRepository.update(client);
+        Assertions.assertDoesNotThrow(() -> rentRepository.add(rent2));
     }
 
     @Test
