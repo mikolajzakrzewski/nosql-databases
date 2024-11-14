@@ -111,7 +111,6 @@ public class RentRepositoryTest {
         MotorVehicle motorVehicle2 = new MotorVehicle("EL12347", 10, 1000);
         Rent rent = new Rent(10000, client, motorVehicle, LocalDateTime.now());
         Rent rent2 = new Rent(10001, client, motorVehicle2, LocalDateTime.now());
-        clientRepository.add(client);
         rentRepository.add(rent);
 
         // ClientType Default allows for 1 vehicle, so the second rent should not be added, exception should be thrown
@@ -129,7 +128,6 @@ public class RentRepositoryTest {
         Client client2 = new Client("11111111111", "Firstname", "Lastname", new Default());
         MotorVehicle motorVehicle = new MotorVehicle("EL12346", 10, 1000);
         Rent rent = new Rent(10000, client, motorVehicle, LocalDateTime.now());
-        vehicleRepository.add(motorVehicle);
         rentRepository.add(rent);
         Rent rent2 = new Rent(10001, client2, motorVehicle, LocalDateTime.now());
         Assertions.assertThrows(MongoWriteException.class, () -> rentRepository.add(rent2));

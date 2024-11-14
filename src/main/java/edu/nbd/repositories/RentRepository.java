@@ -38,15 +38,22 @@ public class RentRepository extends AbstractMongoRepository {
         try {
             clientSession.startTransaction();
 
+            MongoCollection<Client> clientsCollection = getDatabase().getCollection("clients", Client.class);
+            MongoCollection<Vehicle> vehiclesCollection = getDatabase().getCollection("vehicles", Vehicle.class);
             MongoCollection<Rent> rentsCollection = getDatabase().getCollection("rents", Rent.class);
+
+            if (clientsCollection.find(Filters.eq("_id", rent.getClient().getId())).first() == null) {
+                clientsCollection.insertOne(clientSession, rent.getClient());
+            }
+            if (vehiclesCollection.find(Filters.eq("_id", rent.getVehicle().getId())).first() == null) {
+                vehiclesCollection.insertOne(clientSession, rent.getVehicle());
+            }
             rentsCollection.insertOne(clientSession, rent);
 
-            MongoCollection<Vehicle> vehiclesCollection = getDatabase().getCollection("vehicles", Vehicle.class);
             Bson filter = Filters.eq("_id", rent.getVehicle().getId());
             Bson updates = Updates.inc("rented", 1);
             vehiclesCollection.updateOne(clientSession, filter, updates);
 
-            MongoCollection<Client> clientsCollection = getDatabase().getCollection("clients", Client.class);
             Bson clientFilter = Filters.eq("_id", rent.getClient().getId());
             Bson clientUpdates = Updates.inc("currentRentsNumber", 1);
             clientsCollection.updateOne(clientSession, clientFilter, clientUpdates);
