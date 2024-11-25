@@ -1,4 +1,4 @@
-name: nbd-mongo
+name: nbd-mongo-redis
 services:
     mongo_1:
         build: .
@@ -106,6 +106,17 @@ services:
             - mongo-configdb-data-2:/data/configdb:ro
             - mongo-db-data-3:/data/db:ro
             - mongo-configdb-data-3:/data/configdb:ro
+    redis-stack:
+        image: redis/redis-stack:7.4.0-v1
+        restart: always
+        container_name: redis-stack
+        volumes:
+            -   redis-stack-data:/bitnami/redis/data
+        ports:
+            - "8001:8001"
+            - "6379:6379"
+        networks:
+            - redisnet
 
 volumes:
     mongo-db-data-1:
@@ -114,6 +125,9 @@ volumes:
     mongo-configdb-data-2:
     mongo-db-data-3:
     mongo-configdb-data-3:
+    redis-stack-data:
+        driver: local
 
 networks:
     mongonet: { }
+    redisnet: { }
