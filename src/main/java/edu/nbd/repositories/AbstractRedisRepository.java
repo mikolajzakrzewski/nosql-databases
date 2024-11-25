@@ -27,6 +27,10 @@ public abstract class AbstractRedisRepository implements AutoCloseable {
         return pool;
     }
 
+    public void clearCache() {
+        getPool().flushAll();
+    }
+
     @Override
     public void close() {
         if (pool != null) {

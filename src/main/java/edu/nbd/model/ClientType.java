@@ -1,23 +1,31 @@
 package edu.nbd.model;
 
 
+import jakarta.json.bind.annotation.*;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
 @BsonDiscriminator(key = "_type")
+@JsonbTypeInfo({
+        @JsonbSubtype(alias = "default", type = Default.class),
+        @JsonbSubtype(alias = "gold", type = Gold.class)
+})
 public abstract class ClientType {
 
     @BsonProperty("maxVehicles")
+    @JsonbProperty("maxVehicles")
     private int maxVehicles;
 
     @BsonProperty("discount")
+    @JsonbProperty("discount")
     private int discount;
 
     @BsonCreator
-    public ClientType(@BsonProperty("maxVehicles") int maxVehicles,
-                      @BsonProperty("discount") int discount) {
+    @JsonbCreator
+    public ClientType(@BsonProperty("maxVehicles") @JsonbProperty("maxVehicles") int maxVehicles,
+                      @BsonProperty("discount") @JsonbProperty("discount") int discount) {
         this.maxVehicles = maxVehicles;
         this.discount = discount;
     }
@@ -31,11 +39,13 @@ public abstract class ClientType {
     }
 
     @BsonIgnore
+    @JsonbTransient
     public String getTypeInfo() {
         return String.valueOf(maxVehicles) + discount;
     }
 
     @BsonIgnore
+    @JsonbTransient
     public String getInfo() {
         return getTypeInfo();
     }
