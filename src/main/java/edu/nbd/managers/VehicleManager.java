@@ -1,19 +1,18 @@
 package edu.nbd.managers;
 
 import edu.nbd.model.Vehicle;
-import edu.nbd.repositories.VehicleRepository;
+import edu.nbd.repositories.IRepository;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class VehicleManager implements Serializable {
-    private VehicleRepository vehicleRepository;
+    private final IRepository<Vehicle> vehicleRepository;
 
-    public VehicleManager(VehicleRepository vehicleRepository) {
-        if (vehicleRepository == null) {
-            throw new NullPointerException("vehicleRepository is null");
-        } else {
-            this.vehicleRepository = vehicleRepository;
-        }
+    public VehicleManager(IRepository<Vehicle> vehicleRepository) {
+        Objects.requireNonNull(vehicleRepository, "VehicleRepository is null");
+
+        this.vehicleRepository = vehicleRepository;
     }
 
     public Vehicle registerVehicle(Vehicle vehicle) {

@@ -1,21 +1,19 @@
 package edu.nbd.managers;
 
-import edu.nbd.model.Client;
 import edu.nbd.model.Rent;
-import edu.nbd.repositories.RentRepository;
+import edu.nbd.repositories.IRepository;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class RentManager implements Serializable {
-    private RentRepository rentRepository;
+    private final IRepository<Rent> rentRepository;
 
-    public RentManager(RentRepository rentRepository) {
-        if (rentRepository == null) {
-            throw new NullPointerException("RentRepository is null");
-        } else {
-            this.rentRepository = rentRepository;
-        }
+    public RentManager(IRepository<Rent> rentRepository) {
+        Objects.requireNonNull(rentRepository, "RentRepository is null");
+
+        this.rentRepository = rentRepository;
     }
 
     public Rent registerRent(Rent rent) {

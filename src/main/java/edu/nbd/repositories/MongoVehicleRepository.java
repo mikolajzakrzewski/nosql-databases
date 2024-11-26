@@ -9,7 +9,7 @@ import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
 
-public class VehicleRepository extends AbstractMongoRepository {
+public class MongoVehicleRepository extends AbstractMongoRepository implements IRepository<Vehicle> {
 
     public Vehicle findById(Object id) {
         Bson filter = Filters.eq("_id", id);

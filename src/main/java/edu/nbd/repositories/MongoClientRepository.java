@@ -9,7 +9,7 @@ import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
 
-public class ClientRepository extends AbstractMongoRepository {
+public class MongoClientRepository extends AbstractMongoRepository implements IRepository<Client> {
 
     public Client findById(Object id) {
         Bson filter = Filters.eq("_id", id);

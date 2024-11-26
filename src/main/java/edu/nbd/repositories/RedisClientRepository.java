@@ -6,12 +6,12 @@ import jakarta.json.bind.JsonbBuilder;
 
 import java.util.ArrayList;
 
-public class RedisClientRepository extends AbstractRedisRepository {
+public class RedisClientRepository extends AbstractRedisRepository implements IRepository<Client> {
 
     private final static String hashPrefix = "client:";
     private final Jsonb jsonb = JsonbBuilder.create();
 
-    public Client findById(String id) {
+    public Client findById(Object id) {
         String jsonClient = jsonb.toJson(getPool().jsonGet(hashPrefix + id));
         return jsonb.fromJson(jsonClient, Client.class);
     }

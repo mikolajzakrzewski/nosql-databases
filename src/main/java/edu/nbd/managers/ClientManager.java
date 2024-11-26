@@ -1,19 +1,18 @@
 package edu.nbd.managers;
 
 import edu.nbd.model.Client;
-import edu.nbd.repositories.ClientRepository;
+import edu.nbd.repositories.IRepository;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class ClientManager implements Serializable {
-    private final ClientRepository clientRepository;
+    private final IRepository<Client> clientRepository;
 
-    public ClientManager(ClientRepository clientRepository) {
-        if (clientRepository == null) {
-            throw new NullPointerException("clientRepository is null");
-        } else {
-            this.clientRepository = clientRepository;
-        }
+    public ClientManager(IRepository<Client> clientRepository) {
+        Objects.requireNonNull(clientRepository, "ClientRepository is null");
+
+        this.clientRepository = clientRepository;
     }
 
     public Client registerClient(Client client) {
