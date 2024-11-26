@@ -9,7 +9,7 @@ import java.util.ResourceBundle;
 
 public abstract class AbstractRedisRepository implements AutoCloseable {
 
-    private static JedisPooled pool;
+    private JedisPooled pool;
 
     public void initDbConnection() {
         ResourceBundle rb = ResourceBundle.getBundle("redis");
@@ -28,7 +28,10 @@ public abstract class AbstractRedisRepository implements AutoCloseable {
     }
 
     public void clearCache() {
-        getPool().flushAll();
+        if (pool == null) {
+            initDbConnection();
+        }
+        pool.flushAll();
     }
 
     @Override
