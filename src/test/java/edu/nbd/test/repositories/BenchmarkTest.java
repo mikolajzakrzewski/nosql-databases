@@ -5,7 +5,6 @@ import edu.nbd.model.Default;
 import edu.nbd.repositories.ClientRepository;
 import edu.nbd.repositories.MongoClientRepository;
 import edu.nbd.repositories.RedisClientRepository;
-import org.junit.jupiter.api.Nested;
 import org.openjdk.jmh.annotations.*;
 
 @State(Scope.Benchmark)
@@ -14,29 +13,47 @@ public class BenchmarkTest {
     private RedisClientRepository redisClientRepository;
     private ClientRepository clientRepository;
 
+    private int numberOfClients;
+
     @Setup
     public void init() {
         mongoClientRepository = new MongoClientRepository();
         redisClientRepository = new RedisClientRepository();
         clientRepository = new ClientRepository(mongoClientRepository, redisClientRepository);
-
-        Client client = new Client("11111111110", "Firstname", "Lastname", new Default());
-        clientRepository.add(client);
+        numberOfClients = 10;
+        for (int i = 1; i <= numberOfClients; i++) {
+            Client client = new Client("1111111111" + i, "Firstname" + i, "Lastname" + i, new Default());
+            clientRepository.add(client);
+        }
     }
 
     @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
-    @OutputTimeUnit(java.util.concurrent.TimeUnit.MILLISECONDS)
-    public void testFindyById_CacheHit() {
-        clientRepository.findById("11111111110");
+    @Warmup(iterations = 0)
+    @Fork(value = 2)
+    public void readFromCache(){
+        for (int i = 1; i <= numberOfClients; i++) {
+            clientRepository.findById("1111111111" + i);
+        }
     }
 
     @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
-    @OutputTimeUnit(java.util.concurrent.TimeUnit.MILLISECONDS)
-    public void testFindyById_CacheMiss() {
+    @Warmup(iterations = 0)
+    @Fork(value = 2)
+    public void readFromMongoUsingRepository() {
         redisClientRepository.clearCache();
-        clientRepository.findById("11111111110");
+        for (int i = 1; i <= numberOfClients; i++) {
+            clientRepository.findById("1111111111" + i);
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        org.openjdk.jmh.Main.main(args);
+    }
+
+    @TearDown
+    public void cleanUp() {
+        mongoClientRepository.getDatabase().getCollection("clients", Client.class).drop();
+        redisClientRepository.clearCache();
     }
 
 }
