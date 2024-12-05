@@ -28,7 +28,7 @@ public class RedisClientRepository extends AbstractRedisRepository implements IR
     public void add(Client client) {
         String jsonClient = jsonb.toJson(client);
         getPool().jsonSet(hashPrefix + client.getPersonalID(), jsonClient);
-        getPool().expire(hashPrefix + client.getPersonalID(), 60);
+        getPool().expire(hashPrefix + client.getPersonalID(), 600);
     }
 
     public void update(Client client) {
