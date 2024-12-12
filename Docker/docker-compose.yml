@@ -1,0 +1,69 @@
+name: nbd-cassandra-cluster
+services:
+    cassandra1:
+        image:
+            docker.io/bitnami/cassandra:5.0.2
+        restart: always
+        container_name: cassandra1
+        hostname: cassandra1
+        ports:
+            - "7001:7000"
+            - "9042:9042"
+        volumes:
+            - ./cassandra/conf/cassandra1:/opt/bitnami/cassandra/conf
+            - cassandra1_data:/bitnami
+        networks:
+            cassandranet:
+                ipv4_address: 172.24.0.101
+        environment:
+            - CASSANDRA_LISTEN_ADDRESS=cassandra1
+            - CASSANDRA_BROADCAST_ADDRESS=cassandra1
+            - CASSANDRA_SEEDS=cassandra1,cassandra2
+            - CASSANDRA_CLUSTER_NAME=nbd-cassandra-cluster
+            - CASSANDRA_DATACENTER=dc1
+            - CASSANDRA_PASSWORD_SEEDER=yes
+            - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+            - CASSANDRA_USER=cassandra
+            - CASSANDRA_PASSWORD=cassandrapassword
+            - MAX_HEAP_SIZE=2G
+            - HEAP_NEWSIZE=200M
+    cassandra2:
+        image:
+            docker.io/bitnami/cassandra:5.0.2
+        restart: always
+        container_name: cassandra2
+        hostname: cassandra2
+        ports:
+            - "7002:7000"
+            - "9043:9042"
+        volumes:
+            - ./cassandra/conf/cassandra2:/opt/bitnami/cassandra/conf
+            - cassandra2_data:/bitnami
+        networks:
+            cassandranet:
+                ipv4_address: 172.24.0.102
+        environment:
+            - CASSANDRA_LISTEN_ADDRESS=cassandra2
+            - CASSANDRA_BROADCAST_ADDRESS=cassandra2
+            - CASSANDRA_SEEDS=cassandra1,cassandra2
+            - CASSANDRA_CLUSTER_NAME=nbd-cassandra-cluster
+            - CASSANDRA_DATACENTER=dc1
+            - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+            - CASSANDRA_USER=cassandra
+            - CASSANDRA_PASSWORD=cassandrapassword
+            - MAX_HEAP_SIZE=2G
+            - HEAP_NEWSIZE=200M
+
+volumes:
+    cassandra1_data:
+        driver: local
+    cassandra2_data:
+        driver: local
+
+networks:
+    cassandranet:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: 172.24.0.0/16
