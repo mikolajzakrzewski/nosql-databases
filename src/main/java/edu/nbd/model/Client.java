@@ -1,19 +1,31 @@
 package edu.nbd.model;
 
+import com.datastax.oss.driver.api.mapper.annotations.CqlName;
+import com.datastax.oss.driver.api.mapper.annotations.Entity;
+import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
 import edu.nbd.exceptions.ClientException;
 
+@Entity(defaultKeyspace = "nbd")
+@CqlName("clients")
 public class Client {
 
+    @PartitionKey
+    @CqlName("personal_id")
     private String personalID;
 
+    @CqlName("first_name")
     private String firstName;
 
+    @CqlName("last_name")
     private String lastName;
 
+    @CqlName("client_type")
     private ClientType clientType;
 
+    @CqlName("archived")
     private boolean archived;
 
+    @CqlName("current_rents_number")
     private int currentRentsNumber;
 
     public Client() {
@@ -30,6 +42,14 @@ public class Client {
 
     public String getPersonalID() {
         return personalID;
+    }
+
+    public void setPersonalID(String personalID) {
+        if (personalID != null && !personalID.isEmpty()) {
+            this.personalID = personalID;
+        } else {
+            throw new ClientException("Given personal ID shouldn't be empty.");
+        }
     }
 
     public String getFirstName() {

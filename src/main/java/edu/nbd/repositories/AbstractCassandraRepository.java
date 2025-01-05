@@ -4,6 +4,7 @@ import com.datastax.oss.driver.api.core.CqlIdentifier;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.querybuilder.schema.CreateKeyspace;
+import edu.nbd.codecs.ClientTypeCodec;
 
 import java.net.InetSocketAddress;
 
@@ -14,6 +15,7 @@ public class AbstractCassandraRepository implements AutoCloseable {
 
     public void initSession(){
         session = CqlSession.builder()
+                .addTypeCodecs(new ClientTypeCodec())
                 .addContactPoint(new InetSocketAddress("cassandra1", 9042))
                 .addContactPoint(new InetSocketAddress("cassandra2", 9043))
                 .withLocalDatacenter("dc1")
