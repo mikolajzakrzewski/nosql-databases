@@ -1,25 +1,46 @@
 package edu.nbd.model;
 
+import com.datastax.oss.driver.api.mapper.annotations.CqlName;
+import com.datastax.oss.driver.api.mapper.annotations.Entity;
+import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
 import edu.nbd.exceptions.VehicleException;
 
-public abstract class Vehicle {
+@Entity(defaultKeyspace = "nbd")
+@CqlName("vehicles")
+public class Vehicle {
 
+    @PartitionKey
+    @CqlName("plate_number")
     private String plateNumber;
 
+    @CqlName("base_price")
     private int basePrice;
 
+    @CqlName("archived")
     private boolean archived = false;
 
+    @CqlName("rented")
     private int rented = 0;
 
-    public Vehicle() {
-    }
+    @CqlName("discriminator")
+    protected String discriminator;
 
     public Vehicle(String plateNumber, int basePrice) {
         this.plateNumber = plateNumber;
         this.basePrice = basePrice;
         this.archived = false;
         this.rented = 0;
+    }
+
+    public Vehicle(String plateNumber, int basePrice, boolean archived, int rented, String discriminator) {
+        this.plateNumber = plateNumber;
+        this.basePrice = basePrice;
+        this.archived = archived;
+        this.rented = rented;
+        this.discriminator = discriminator;
+    }
+
+    public Vehicle() {
     }
 
     public String getVehicleInfo() {
@@ -64,6 +85,18 @@ public abstract class Vehicle {
 
     public int getRented() {
         return rented;
+    }
+
+    public void setRented(int rented) {
+        this.rented = rented;
+    }
+
+    public String getDiscriminator() {
+        return discriminator;
+    }
+
+    public void setDiscriminator(String discriminator) {
+        this.discriminator = discriminator;
     }
 
     public String getInfo() {
