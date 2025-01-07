@@ -10,21 +10,54 @@ public class Rent {
 
     private long id;
 
+    private String clientId;
+
     private Client client;
 
     private Vehicle vehicle;
+
+    private String plateNumber;
 
     private LocalDateTime beginTime;
 
     private LocalDateTime endTime;
 
-    private double rentCost = 0;
+    private double rentCost;
+
+    private boolean archived;
 
     public Rent(long id, Client client, Vehicle vehicle, LocalDateTime beginTime) {
         this.id = id;
         this.client = client;
         this.vehicle = vehicle;
         this.beginTime = Objects.requireNonNullElseGet(beginTime, LocalDateTime::now).withNano(0);
+        this.endTime = null;
+        this.archived = false;
+        this.rentCost = 0;
+        this.clientId = client.getPersonalID();
+        this.plateNumber = vehicle.getPlateNumber();
+    }
+
+    public Rent(long id, Client client, Vehicle vehicle, LocalDateTime beginTime, LocalDateTime endTime, double rentCost, boolean archived) {
+        this.id = id;
+        this.client = client;
+        this.vehicle = vehicle;
+        this.beginTime = Objects.requireNonNullElseGet(beginTime, LocalDateTime::now).withNano(0);
+        this.endTime = Objects.requireNonNullElseGet(endTime, LocalDateTime::now).withNano(0);
+        this.archived = archived;
+        this.rentCost = rentCost;
+        this.clientId = client.getPersonalID();
+        this.plateNumber = vehicle.getPlateNumber();
+    }
+
+    public Rent(long id, String clientId, String plateNumber, LocalDateTime beginTime, LocalDateTime endTime, double rentCost, boolean archived) {
+        this.id = id;
+        this.clientId = clientId;
+        this.plateNumber = plateNumber;
+        this.beginTime = Objects.requireNonNullElseGet(beginTime, LocalDateTime::now).withNano(0);
+        this.endTime = Objects.requireNonNullElseGet(endTime, LocalDateTime::now).withNano(0);
+        this.archived = archived;
+        this.rentCost = rentCost;
     }
 
     public Rent() {
