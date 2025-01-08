@@ -73,7 +73,7 @@ public class Rent {
                 (endTime != null ? endTime.toString() : "current");
     }
 
-    public long getId() {
+    public long getRentId() {
         return id;
     }
 
@@ -119,4 +119,54 @@ public class Rent {
     public double getRentCost() {
         return rentCost;
     }
+
+    public boolean isArchived() {
+        return archived;
+    }
+
+    public void setArchived(boolean archived) {
+        this.archived = archived;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public String getPlateNumber() {
+        return plateNumber;
+    }
+
+    public void setPlateNumber(String plateNumber) {
+        this.plateNumber = plateNumber;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+    public void setVehicle(Vehicle vehicle) {
+        this.vehicle = vehicle;
+    }
+
+    public void setBeginTime(LocalDateTime beginTime) {
+        this.beginTime = beginTime;
+    }
+
+    public void setRentCost(double rentCost) {
+        this.rentCost = rentCost;
+    }
+
+    public void setArchived(Boolean archived) {
+        this.archived = archived;
+    }
+
+
 }

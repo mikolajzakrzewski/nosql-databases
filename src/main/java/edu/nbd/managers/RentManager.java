@@ -17,7 +17,7 @@ public class RentManager implements Serializable {
     }
 
     public Rent registerRent(Rent rent) {
-        Rent newRent = rentRepository.findById(rent.getId());
+        Rent newRent = rentRepository.findById(rent.getRentId());
         if (newRent != null) {
             rentRepository.update(rent);
         } else {
