@@ -10,6 +10,7 @@ import edu.nbd.dao.RentDao;
 public interface RentMapper {
     @DaoFactory
     RentDao rentDao(@DaoKeyspace String keyspace, @DaoTable String table);
+
     @DaoFactory
     RentDao rentDao();
 }

@@ -12,7 +12,7 @@ import edu.nbd.model.Rent;
 
 import java.util.List;
 
-public class CassandraRentRepository extends CassandraRepository implements IRepository<Rent> {
+public class CassandraRentRepository extends CassandraRepository {
 
     private final RentDao rentDao;
 
@@ -70,22 +70,14 @@ public class CassandraRentRepository extends CassandraRepository implements IRep
         return rentDao.findByVehicleId(vehicleId);
     }
 
-    @Override
-    public Rent findById(Object id) {
-        return rentDao.findById((long) id);
-    }
-
-    @Override
     public void add(Rent obj) {
         rentDao.add(obj);
     }
 
-    @Override
     public void update(Rent obj) {
         rentDao.update(obj);
     }
 
-    @Override
     public void delete(Rent obj) {
         rentDao.delete(obj);
     }

@@ -4,9 +4,9 @@ import com.datastax.oss.driver.api.core.CqlIdentifier;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BatchStatement;
 import com.datastax.oss.driver.api.core.cql.BatchType;
+import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.mapper.MapperContext;
 import com.datastax.oss.driver.api.querybuilder.delete.Delete;
-import com.datastax.oss.driver.api.querybuilder.insert.Insert;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.relation.Relation;
 import com.datastax.oss.driver.api.querybuilder.select.Select;
@@ -37,7 +37,7 @@ public class RentProvider {
     }
 
     public void add(Rent rent) {
-        Insert insertClient = QueryBuilder
+        SimpleStatement insertRentByClient = QueryBuilder
                 .insertInto(RENTS_BY_CLIENT)
                 .value(RENT_ID, QueryBuilder.literal(rent.getId()))
                 .value(PERSONAL_ID, QueryBuilder.literal(rent.getPersonalId()))
@@ -46,11 +46,12 @@ public class RentProvider {
                 .value(END_TIME, QueryBuilder.literal(rent.getEndTime(), timeCodec))
                 .value(RENT_COST, QueryBuilder.literal(rent.getRentCost()))
                 .value(ARCHIVED, QueryBuilder.literal(rent.isArchived()))
-                .ifNotExists();
+                .ifNotExists()
+                .build();
 
-        session.execute(insertClient.build());
+        session.execute(insertRentByClient);
 
-        Insert insertVehicle = QueryBuilder
+        SimpleStatement insertRentByVehicle = QueryBuilder
                 .insertInto(RENTS_BY_VEHICLE)
                 .value(RENT_ID, QueryBuilder.literal(rent.getId()))
                 .value(PERSONAL_ID, QueryBuilder.literal(rent.getPersonalId()))
@@ -59,19 +60,10 @@ public class RentProvider {
                 .value(END_TIME, QueryBuilder.literal(rent.getEndTime(), timeCodec))
                 .value(RENT_COST, QueryBuilder.literal(rent.getRentCost()))
                 .value(ARCHIVED, QueryBuilder.literal(rent.isArchived()))
-                .ifNotExists();
+                .ifNotExists()
+                .build();
 
-        session.execute(insertVehicle.build());
-    }
-
-    public Rent findById(long id) {
-        Select select = QueryBuilder
-                .selectFrom(RENTS_BY_CLIENT)
-                .all()
-                .where(Relation.column(RENT_ID).isEqualTo(QueryBuilder.literal(id)));
-        ResultSet rs = session.execute(select.build());
-        List<Rent> rents = convertRowsToRents(rs);
-        return rents.isEmpty() ? null : rents.getFirst();
+        session.execute(insertRentByVehicle);
     }
 
     public List<Rent> findByClientId(String clientId) {

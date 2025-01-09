@@ -60,7 +60,7 @@ public class ClientTypeCodec implements TypeCodec<ClientType> {
         if (clientType == null) {
             return "NULL";
         }
-        return clientType.getClass().getSimpleName() + ";" + clientType.getMaxVehicles() + ";" + clientType.getDiscount();
+        return clientType.getClass().getSimpleName();
     }
 
     @Nullable
