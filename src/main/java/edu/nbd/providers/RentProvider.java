@@ -37,8 +37,8 @@ public class RentProvider {
     }
 
     public void add(Rent rent) {
-        Insert insert = QueryBuilder
-                .insertInto(RENTS_BY_CLIENT, RENTS_BY_VEHICLE)
+        Insert insertClient = QueryBuilder
+                .insertInto(RENTS_BY_CLIENT)
                 .value(RENT_ID, QueryBuilder.literal(rent.getRentId()))
                 .value(CLIENT_ID, QueryBuilder.literal(rent.getClientId()))
                 .value(VEHICLE_ID, QueryBuilder.literal(rent.getPlateNumber()))
@@ -48,7 +48,30 @@ public class RentProvider {
                 .value(ARCHIVED, QueryBuilder.literal(rent.isArchived()))
                 .ifNotExists();
 
-        session.execute(insert.build());
+        session.execute(insertClient.build());
+
+        Insert insertVehicle = QueryBuilder
+                .insertInto(RENTS_BY_VEHICLE)
+                .value(RENT_ID, QueryBuilder.literal(rent.getRentId()))
+                .value(CLIENT_ID, QueryBuilder.literal(rent.getClientId()))
+                .value(VEHICLE_ID, QueryBuilder.literal(rent.getPlateNumber()))
+                .value(BEGIN_TIME, QueryBuilder.literal(rent.getBeginTime(), timeCodec))
+                .value(END_TIME, QueryBuilder.literal(rent.getEndTime(), timeCodec))
+                .value(RENT_COST, QueryBuilder.literal(rent.getRentCost()))
+                .value(ARCHIVED, QueryBuilder.literal(rent.isArchived()))
+                .ifNotExists();
+
+        session.execute(insertVehicle.build());
+    }
+
+    public Rent findById(long id) {
+        Select select = QueryBuilder
+                .selectFrom(RENTS_BY_CLIENT)
+                .all()
+                .where(Relation.column(RENT_ID).isEqualTo(QueryBuilder.literal(id)));
+        ResultSet rs = session.execute(select.build());
+        List<Rent> rents = convertRowsToRents(rs);
+        return rents.isEmpty() ? null : rents.getFirst();
     }
 
     public List<Rent> findByClientId(String clientId) {

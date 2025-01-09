@@ -14,6 +14,9 @@ public interface RentDao {
     @StatementAttributes(consistencyLevel = "ONE", pageSize = 100)
     @QueryProvider(providerClass = RentProvider.class)
     List<Rent> findByVehicleId(String vehicleId);
+    @StatementAttributes(consistencyLevel = "ONE", pageSize = 100)
+    @QueryProvider(providerClass = RentProvider.class)
+    Rent findById(long id);
     @StatementAttributes(consistencyLevel = "QUORUM")
     @QueryProvider(providerClass = RentProvider.class)
     void add(Rent rent);
