@@ -4,12 +4,13 @@ import com.datastax.oss.driver.api.core.CqlIdentifier;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.core.type.DataTypes;
 import com.datastax.oss.driver.api.querybuilder.SchemaBuilder;
+import edu.nbd.cassandra.CassandraRepository;
 import edu.nbd.dao.VehicleDao;
 import edu.nbd.mappers.VehicleMapper;
 import edu.nbd.mappers.VehicleMapperBuilder;
 import edu.nbd.model.Vehicle;
 
-public class CassandraVehicleRepository extends AbstractCassandraRepository implements IRepository<Vehicle> {
+public class CassandraVehicleRepository extends CassandraRepository implements IRepository<Vehicle> {
 
     private final VehicleDao vehicleDao;
 

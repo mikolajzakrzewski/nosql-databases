@@ -4,12 +4,13 @@ import com.datastax.oss.driver.api.core.CqlIdentifier;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.core.type.DataTypes;
 import com.datastax.oss.driver.api.querybuilder.SchemaBuilder;
+import edu.nbd.cassandra.CassandraRepository;
 import edu.nbd.dao.ClientDao;
 import edu.nbd.mappers.ClientMapper;
 import edu.nbd.mappers.ClientMapperBuilder;
 import edu.nbd.model.Client;
 
-public class CassandraClientRepository extends AbstractCassandraRepository implements IRepository<Client> {
+public class CassandraClientRepository extends CassandraRepository implements IRepository<Client> {
 
     private final ClientDao clientDao;
 

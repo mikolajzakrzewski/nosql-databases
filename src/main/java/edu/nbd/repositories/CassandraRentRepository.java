@@ -4,6 +4,7 @@ import com.datastax.oss.driver.api.core.CqlIdentifier;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.core.type.DataTypes;
 import com.datastax.oss.driver.api.querybuilder.SchemaBuilder;
+import edu.nbd.cassandra.CassandraRepository;
 import edu.nbd.dao.RentDao;
 import edu.nbd.mappers.RentMapper;
 import edu.nbd.mappers.RentMapperBuilder;
@@ -11,7 +12,7 @@ import edu.nbd.model.Rent;
 
 import java.util.List;
 
-public class CassandraRentRepository extends AbstractCassandraRepository implements IRepository<Rent> {
+public class CassandraRentRepository extends CassandraRepository implements IRepository<Rent> {
 
     private final RentDao rentDao;
 

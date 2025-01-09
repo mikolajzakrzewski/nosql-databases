@@ -1,16 +1,15 @@
-package edu.nbd.repositories;
+package edu.nbd.cassandra;
 
 import com.datastax.oss.driver.api.core.CqlIdentifier;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.querybuilder.schema.CreateKeyspace;
-import edu.nbd.codecs.ClientTypeCodec;
 
 import java.net.InetSocketAddress;
 
 import static com.datastax.oss.driver.api.querybuilder.SchemaBuilder.createKeyspace;
 
-public class AbstractCassandraRepository implements AutoCloseable {
+public class CassandraRepository implements AutoCloseable {
     private static CqlSession session;
 
     public void initSession(){

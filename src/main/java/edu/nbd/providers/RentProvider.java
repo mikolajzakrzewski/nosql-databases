@@ -12,7 +12,7 @@ import com.datastax.oss.driver.api.querybuilder.relation.Relation;
 import com.datastax.oss.driver.api.querybuilder.select.Select;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.querybuilder.update.Update;
-import edu.nbd.codecs.TimeCodec;
+import edu.nbd.cassandra.TimeCodec;
 import edu.nbd.model.Rent;
 
 import java.util.List;

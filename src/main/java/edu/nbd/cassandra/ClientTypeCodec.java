@@ -1,4 +1,4 @@
-package edu.nbd.codecs;
+package edu.nbd.cassandra;
 
 import com.datastax.oss.driver.api.core.ProtocolVersion;
 import com.datastax.oss.driver.api.core.type.DataType;
