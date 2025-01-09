@@ -1,13 +1,13 @@
 package edu.nbd.test;
 
+import com.datastax.oss.driver.api.core.CqlIdentifier;
+import com.datastax.oss.driver.api.core.cql.SimpleStatement;
+import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import edu.nbd.model.Client;
 import edu.nbd.model.Default;
 import edu.nbd.model.Gold;
 import edu.nbd.repositories.CassandraClientRepository;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 public class CassandraClientRepositoryTest {
 
@@ -18,9 +18,18 @@ public class CassandraClientRepositoryTest {
         CASSANDRA_CLIENT_REPOSITORY = new CassandraClientRepository();
     }
 
+    @BeforeEach
+    public void cleanUp() {
+        SimpleStatement truncateClients = QueryBuilder.truncate(CqlIdentifier.fromCql("clients")).build();
+
+        CASSANDRA_CLIENT_REPOSITORY.getSession().execute(truncateClients);
+    }
+
     @AfterAll
     public static void tearDown() {
-        CASSANDRA_CLIENT_REPOSITORY.close();
+        SimpleStatement truncateClients = QueryBuilder.truncate(CqlIdentifier.fromCql("clients")).build();
+
+        CASSANDRA_CLIENT_REPOSITORY.getSession().execute(truncateClients);
     }
 
     @Test

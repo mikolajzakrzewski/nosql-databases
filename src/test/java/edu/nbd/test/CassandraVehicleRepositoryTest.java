@@ -1,5 +1,8 @@
 package edu.nbd.test;
 
+import com.datastax.oss.driver.api.core.CqlIdentifier;
+import com.datastax.oss.driver.api.core.cql.SimpleStatement;
+import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import edu.nbd.model.Bicycle;
 import edu.nbd.model.MotorVehicle;
 import edu.nbd.model.Vehicle;
@@ -15,9 +18,18 @@ public class CassandraVehicleRepositoryTest {
         CASSANDRA_VEHICLE_REPOSITORY = new CassandraVehicleRepository();
     }
 
+    @BeforeEach
+    public void cleanUp() {
+        SimpleStatement truncateVehicles = QueryBuilder.truncate(CqlIdentifier.fromCql("vehicles")).build();
+
+        CASSANDRA_VEHICLE_REPOSITORY.getSession().execute(truncateVehicles);
+    }
+
     @AfterAll
     public static void tearDown() {
-        CASSANDRA_VEHICLE_REPOSITORY.close();
+        SimpleStatement truncateVehicles = QueryBuilder.truncate(CqlIdentifier.fromCql("vehicles")).build();
+
+        CASSANDRA_VEHICLE_REPOSITORY.getSession().execute(truncateVehicles);
     }
 
     @Test
