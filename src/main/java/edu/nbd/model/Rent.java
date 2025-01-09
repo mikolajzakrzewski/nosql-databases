@@ -10,7 +10,7 @@ public class Rent {
 
     private long id;
 
-    private String clientId;
+    private String personalId;
 
     private Client client;
 
@@ -34,7 +34,7 @@ public class Rent {
         this.endTime = null;
         this.archived = false;
         this.rentCost = 0;
-        this.clientId = client.getPersonalID();
+        this.personalId = client.getPersonalID();
         this.plateNumber = vehicle.getPlateNumber();
     }
 
@@ -46,13 +46,13 @@ public class Rent {
         this.endTime = Objects.requireNonNullElseGet(endTime, LocalDateTime::now).withNano(0);
         this.archived = archived;
         this.rentCost = rentCost;
-        this.clientId = client.getPersonalID();
+        this.personalId = client.getPersonalID();
         this.plateNumber = vehicle.getPlateNumber();
     }
 
-    public Rent(long id, String clientId, String plateNumber, LocalDateTime beginTime, LocalDateTime endTime, double rentCost, boolean archived) {
+    public Rent(long id, String personalId, String plateNumber, LocalDateTime beginTime, LocalDateTime endTime, double rentCost, boolean archived) {
         this.id = id;
-        this.clientId = clientId;
+        this.personalId = personalId;
         this.plateNumber = plateNumber;
         this.beginTime = Objects.requireNonNullElseGet(beginTime, LocalDateTime::now).withNano(0);
         this.endTime = Objects.requireNonNullElseGet(endTime, LocalDateTime::now).withNano(0);
@@ -73,7 +73,7 @@ public class Rent {
                 (endTime != null ? endTime.toString() : "current");
     }
 
-    public long getRentId() {
+    public long getId() {
         return id;
     }
 
@@ -128,12 +128,12 @@ public class Rent {
         this.archived = archived;
     }
 
-    public String getClientId() {
-        return clientId;
+    public String getPersonalId() {
+        return personalId;
     }
 
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
+    public void setPersonalId(String personalId) {
+        this.personalId = personalId;
     }
 
     public String getPlateNumber() {
@@ -167,6 +167,4 @@ public class Rent {
     public void setArchived(Boolean archived) {
         this.archived = archived;
     }
-
-
 }

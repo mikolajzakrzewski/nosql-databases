@@ -1,23 +1,37 @@
 package edu.nbd.model;
 
+import com.datastax.oss.driver.api.mapper.annotations.ClusteringColumn;
 import com.datastax.oss.driver.api.mapper.annotations.CqlName;
 import com.datastax.oss.driver.api.mapper.annotations.Entity;
 import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
 
 import java.time.LocalDateTime;
 
-@Entity(defaultKeyspace = "rent_a_vehicle")
+@Entity(defaultKeyspace = "nbd")
 @CqlName("rents_by_client")
 public class RentsByClient extends Rent {
+
+    @PartitionKey
+    @CqlName("personal_id")
+    private String personalId;
+
+    @ClusteringColumn
     @CqlName("rent_id")
     private long rentId;
-    @CqlName("client_id")
-    @PartitionKey
-    private String clientId;
+
+    @CqlName("plate_number")
     private String plateNumber;
+
+    @CqlName("begin_time")
     private LocalDateTime beginTime;
+
+    @CqlName("end_time")
     private LocalDateTime endTime;
+
+    @CqlName("rent_cost")
     private double rentCost;
+
+    @CqlName("archived")
     private boolean archived;
 
     public RentsByClient() {}
@@ -26,15 +40,15 @@ public class RentsByClient extends Rent {
         super(id, client, vehicle, beginTime);
     }
 
-    public RentsByClient(long id, String clientId, String plateNumber, LocalDateTime beginTime, LocalDateTime endTime, double rentCost, boolean archived) {
-        super(id, clientId, plateNumber, beginTime, endTime, rentCost, archived);
+    public RentsByClient(long id, String personalId, String plateNumber, LocalDateTime beginTime, LocalDateTime endTime, double rentCost, boolean archived) {
+        super(id, personalId, plateNumber, beginTime, endTime, rentCost, archived);
     }
 
     public RentsByClient(long id, Client client, Vehicle vehicle, LocalDateTime beginTime, LocalDateTime endTime, double rentCost, boolean archived) {
         super(id, client, vehicle, beginTime, endTime, rentCost, archived);
     }
 
-    public long getRentId() {
+    public long getId() {
         return rentId;
     }
 
@@ -42,12 +56,12 @@ public class RentsByClient extends Rent {
         this.rentId = rentId;
     }
 
-    public String getClientId() {
-        return clientId;
+    public String getPersonalId() {
+        return personalId;
     }
 
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
+    public void setPersonalId(String personalId) {
+        this.personalId = personalId;
     }
 
     public String getPlateNumber() {

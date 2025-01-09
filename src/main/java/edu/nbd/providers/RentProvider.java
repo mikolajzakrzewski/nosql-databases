@@ -25,8 +25,8 @@ public class RentProvider {
     public static final CqlIdentifier RENTS_BY_CLIENT = CqlIdentifier.fromCql("rents_by_client");
     public static final CqlIdentifier RENTS_BY_VEHICLE = CqlIdentifier.fromCql("rents_by_vehicle");
     public static final CqlIdentifier RENT_ID = CqlIdentifier.fromCql("rent_id");
-    public static final CqlIdentifier CLIENT_ID = CqlIdentifier.fromCql("client_id");
-    public static final CqlIdentifier VEHICLE_ID = CqlIdentifier.fromCql("vehicle_id");
+    public static final CqlIdentifier PERSONAL_ID = CqlIdentifier.fromCql("personal_id");
+    public static final CqlIdentifier PLATE_NUMBER = CqlIdentifier.fromCql("plate_number");
     public static final CqlIdentifier BEGIN_TIME = CqlIdentifier.fromCql("begin_time");
     public static final CqlIdentifier END_TIME = CqlIdentifier.fromCql("end_time");
     public static final CqlIdentifier RENT_COST = CqlIdentifier.fromCql("rent_cost");
@@ -39,9 +39,9 @@ public class RentProvider {
     public void add(Rent rent) {
         Insert insertClient = QueryBuilder
                 .insertInto(RENTS_BY_CLIENT)
-                .value(RENT_ID, QueryBuilder.literal(rent.getRentId()))
-                .value(CLIENT_ID, QueryBuilder.literal(rent.getClientId()))
-                .value(VEHICLE_ID, QueryBuilder.literal(rent.getPlateNumber()))
+                .value(RENT_ID, QueryBuilder.literal(rent.getId()))
+                .value(PERSONAL_ID, QueryBuilder.literal(rent.getPersonalId()))
+                .value(PLATE_NUMBER, QueryBuilder.literal(rent.getPlateNumber()))
                 .value(BEGIN_TIME, QueryBuilder.literal(rent.getBeginTime(), timeCodec))
                 .value(END_TIME, QueryBuilder.literal(rent.getEndTime(), timeCodec))
                 .value(RENT_COST, QueryBuilder.literal(rent.getRentCost()))
@@ -52,9 +52,9 @@ public class RentProvider {
 
         Insert insertVehicle = QueryBuilder
                 .insertInto(RENTS_BY_VEHICLE)
-                .value(RENT_ID, QueryBuilder.literal(rent.getRentId()))
-                .value(CLIENT_ID, QueryBuilder.literal(rent.getClientId()))
-                .value(VEHICLE_ID, QueryBuilder.literal(rent.getPlateNumber()))
+                .value(RENT_ID, QueryBuilder.literal(rent.getId()))
+                .value(PERSONAL_ID, QueryBuilder.literal(rent.getPersonalId()))
+                .value(PLATE_NUMBER, QueryBuilder.literal(rent.getPlateNumber()))
                 .value(BEGIN_TIME, QueryBuilder.literal(rent.getBeginTime(), timeCodec))
                 .value(END_TIME, QueryBuilder.literal(rent.getEndTime(), timeCodec))
                 .value(RENT_COST, QueryBuilder.literal(rent.getRentCost()))
@@ -78,7 +78,7 @@ public class RentProvider {
         Select select = QueryBuilder
                 .selectFrom(RENTS_BY_CLIENT)
                 .all()
-                .where(Relation.column(CLIENT_ID).isEqualTo(QueryBuilder.literal(clientId)));
+                .where(Relation.column(PERSONAL_ID).isEqualTo(QueryBuilder.literal(clientId)));
         ResultSet rs = session.execute(select.build());
         return convertRowsToRents(rs);
     }
@@ -87,7 +87,7 @@ public class RentProvider {
         Select select = QueryBuilder
                 .selectFrom(RENTS_BY_VEHICLE)
                 .all()
-                .where(Relation.column(VEHICLE_ID).isEqualTo(QueryBuilder.literal(vehicleId)));
+                .where(Relation.column(PLATE_NUMBER).isEqualTo(QueryBuilder.literal(vehicleId)));
         ResultSet rs = session.execute(select.build());
         return convertRowsToRents(rs);
     }
@@ -98,18 +98,16 @@ public class RentProvider {
                 .setColumn(END_TIME, QueryBuilder.literal(rent.getEndTime(), timeCodec))
                 .setColumn(RENT_COST, QueryBuilder.literal(rent.getRentCost()))
                 .setColumn(ARCHIVED, QueryBuilder.literal(rent.isArchived()))
-                .where(Relation.column(RENT_ID).isEqualTo(QueryBuilder.literal(rent.getRentId())))
-                .where(Relation.column(CLIENT_ID).isEqualTo(QueryBuilder.literal(rent.getClientId())))
-                .ifExists();
+                .where(Relation.column(RENT_ID).isEqualTo(QueryBuilder.literal(rent.getId())))
+                .where(Relation.column(PERSONAL_ID).isEqualTo(QueryBuilder.literal(rent.getPersonalId())));
 
         Update updateByVehicle = QueryBuilder
                 .update(RENTS_BY_VEHICLE)
                 .setColumn(END_TIME, QueryBuilder.literal(rent.getEndTime(), timeCodec))
                 .setColumn(RENT_COST, QueryBuilder.literal(rent.getRentCost()))
                 .setColumn(ARCHIVED, QueryBuilder.literal(rent.isArchived()))
-                .where(Relation.column(RENT_ID).isEqualTo(QueryBuilder.literal(rent.getRentId())))
-                .where(Relation.column(VEHICLE_ID).isEqualTo(QueryBuilder.literal(rent.getPlateNumber())))
-                .ifExists();
+                .where(Relation.column(RENT_ID).isEqualTo(QueryBuilder.literal(rent.getId())))
+                .where(Relation.column(PLATE_NUMBER).isEqualTo(QueryBuilder.literal(rent.getPlateNumber())));
 
         BatchStatement batch = BatchStatement.builder(BatchType.LOGGED)
                 .addStatement(updateByClient.build())
@@ -122,13 +120,13 @@ public class RentProvider {
     public void delete(Rent rent) {
         Delete deleteClient = QueryBuilder
                 .deleteFrom(RENTS_BY_CLIENT)
-                .where(Relation.column(RENT_ID).isEqualTo(QueryBuilder.literal(rent.getRentId())))
-                .where(Relation.column(CLIENT_ID).isEqualTo(QueryBuilder.literal(rent.getClientId())));
+                .where(Relation.column(RENT_ID).isEqualTo(QueryBuilder.literal(rent.getId())))
+                .where(Relation.column(PERSONAL_ID).isEqualTo(QueryBuilder.literal(rent.getPersonalId())));
 
         Delete deleteVehicle = QueryBuilder
                 .deleteFrom(RENTS_BY_VEHICLE)
-                .where(Relation.column(RENT_ID).isEqualTo(QueryBuilder.literal(rent.getRentId())))
-                .where(Relation.column(VEHICLE_ID).isEqualTo(QueryBuilder.literal(rent.getPlateNumber())));
+                .where(Relation.column(RENT_ID).isEqualTo(QueryBuilder.literal(rent.getId())))
+                .where(Relation.column(PLATE_NUMBER).isEqualTo(QueryBuilder.literal(rent.getPlateNumber())));
 
         BatchStatement batch = BatchStatement.builder(BatchType.LOGGED)
                 .addStatement(deleteClient.build())
@@ -142,8 +140,8 @@ public class RentProvider {
         return rs.all().stream()
                 .map(row -> new Rent(
                         row.getLong(RENT_ID.asCql(true)),
-                        row.getString(CLIENT_ID.asCql(true)),
-                        row.getString(VEHICLE_ID.asCql(true)),
+                        row.getString(PERSONAL_ID.asCql(true)),
+                        row.getString(PLATE_NUMBER.asCql(true)),
                         row.isNull(BEGIN_TIME.asCql(true)) ? null : row.get(BEGIN_TIME.asCql(true), timeCodec),
                         row.isNull(END_TIME.asCql(true)) ? null : row.get(END_TIME.asCql(true), timeCodec),
                         row.getDouble(RENT_COST.asCql(true)),
