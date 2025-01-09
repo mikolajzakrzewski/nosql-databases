@@ -16,8 +16,8 @@ public class MotorVehicle extends Vehicle {
         this.engineDisplacement = engineDisplacement;
     }
 
-    public MotorVehicle(String plateNumber, int basePrice, boolean archived, int rented, String discriminator, int engineDisplacement) {
-        super(plateNumber, basePrice, archived, rented, discriminator);
+    public MotorVehicle(String plateNumber, int basePrice, boolean archived, String discriminator, int engineDisplacement) {
+        super(plateNumber, basePrice, archived, discriminator);
         this.engineDisplacement = engineDisplacement;
     }
 

@@ -28,7 +28,6 @@ public class CassandraClientRepository extends CassandraRepository implements IR
                 .withColumn(CqlIdentifier.fromCql("last_name"), DataTypes.TEXT)
                 .withColumn(CqlIdentifier.fromCql("client_type"), DataTypes.TEXT)
                 .withColumn(CqlIdentifier.fromCql("archived"), DataTypes.BOOLEAN)
-                .withColumn(CqlIdentifier.fromCql("current_rents_number"), DataTypes.INT)
                 .build();
 
         getSession().execute(createClients);

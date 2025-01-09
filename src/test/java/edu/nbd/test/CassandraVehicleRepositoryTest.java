@@ -18,17 +18,9 @@ public class CassandraVehicleRepositoryTest {
         CASSANDRA_VEHICLE_REPOSITORY = new CassandraVehicleRepository();
     }
 
-    @BeforeEach
+    @AfterEach
     public void cleanUp() {
         SimpleStatement truncateVehicles = QueryBuilder.truncate(CqlIdentifier.fromCql("vehicles")).build();
-
-        CASSANDRA_VEHICLE_REPOSITORY.getSession().execute(truncateVehicles);
-    }
-
-    @AfterAll
-    public static void tearDown() {
-        SimpleStatement truncateVehicles = QueryBuilder.truncate(CqlIdentifier.fromCql("vehicles")).build();
-
         CASSANDRA_VEHICLE_REPOSITORY.getSession().execute(truncateVehicles);
     }
 

@@ -57,7 +57,6 @@ public class VehicleProvider {
                                 .setString(CqlIdentifier.fromCql("plate_number"), bicycle.getPlateNumber())
                                 .setInt(CqlIdentifier.fromCql("base_price"), bicycle.getBasePrice())
                                 .setBoolean(CqlIdentifier.fromCql("archived"), bicycle.isArchived())
-                                .setInt(CqlIdentifier.fromCql("rented"), bicycle.getRented())
                                 .setString(CqlIdentifier.fromCql("discriminator"), bicycle.getDiscriminator());
                     }
                     case "motor_vehicle" -> {
@@ -67,7 +66,6 @@ public class VehicleProvider {
                                 .setString(CqlIdentifier.fromCql("plate_number"), motorVehicle.getPlateNumber())
                                 .setInt(CqlIdentifier.fromCql("base_price"), motorVehicle.getBasePrice())
                                 .setBoolean(CqlIdentifier.fromCql("archived"), motorVehicle.isArchived())
-                                .setInt(CqlIdentifier.fromCql("rented"), motorVehicle.getRented())
                                 .setString(CqlIdentifier.fromCql("discriminator"), motorVehicle.getDiscriminator())
                                 .setInt(CqlIdentifier.fromCql("engine_displacement"), motorVehicle.getEngineDisplacement());
                     }
@@ -86,7 +84,6 @@ public class VehicleProvider {
                                 .setString(CqlIdentifier.fromCql("plate_number"), bicycle.getPlateNumber())
                                 .setInt(CqlIdentifier.fromCql("base_price"), bicycle.getBasePrice())
                                 .setBoolean(CqlIdentifier.fromCql("archived"), bicycle.isArchived())
-                                .setInt(CqlIdentifier.fromCql("rented"), bicycle.getRented())
                                 .setString(CqlIdentifier.fromCql("discriminator"), bicycle.getDiscriminator());
                     }
                     case "motor_vehicle" -> {
@@ -96,7 +93,6 @@ public class VehicleProvider {
                                 .setString(CqlIdentifier.fromCql("plate_number"), motorVehicle.getPlateNumber())
                                 .setInt(CqlIdentifier.fromCql("base_price"), motorVehicle.getBasePrice())
                                 .setBoolean(CqlIdentifier.fromCql("archived"), motorVehicle.isArchived())
-                                .setInt(CqlIdentifier.fromCql("rented"), motorVehicle.getRented())
                                 .setString(CqlIdentifier.fromCql("discriminator"), motorVehicle.getDiscriminator())
                                 .setInt(CqlIdentifier.fromCql("engine_displacement"), motorVehicle.getEngineDisplacement());
                     }
@@ -110,7 +106,6 @@ public class VehicleProvider {
                 bicycleRow.getString(CqlIdentifier.fromCql("plate_number")),
                 bicycleRow.getInt(CqlIdentifier.fromCql("base_price")),
                 bicycleRow.getBoolean(CqlIdentifier.fromCql("archived")),
-                bicycleRow.getInt(CqlIdentifier.fromCql("rented")),
                 bicycleRow.getString(CqlIdentifier.fromCql("discriminator"))
         );
     }
@@ -120,7 +115,6 @@ public class VehicleProvider {
                 motorVehicleRow.getString(CqlIdentifier.fromCql("plate_number")),
                 motorVehicleRow.getInt(CqlIdentifier.fromCql("base_price")),
                 motorVehicleRow.getBoolean(CqlIdentifier.fromCql("archived")),
-                motorVehicleRow.getInt(CqlIdentifier.fromCql("rented")),
                 motorVehicleRow.getString(CqlIdentifier.fromCql("discriminator")),
                 motorVehicleRow.getInt(CqlIdentifier.fromCql("engine_displacement"))
         );

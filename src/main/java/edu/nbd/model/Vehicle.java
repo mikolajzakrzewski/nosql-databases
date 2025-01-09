@@ -19,9 +19,6 @@ public class Vehicle {
     @CqlName("archived")
     private boolean archived = false;
 
-    @CqlName("rented")
-    private int rented = 0;
-
     @CqlName("discriminator")
     protected String discriminator;
 
@@ -29,14 +26,12 @@ public class Vehicle {
         this.plateNumber = plateNumber;
         this.basePrice = basePrice;
         this.archived = false;
-        this.rented = 0;
     }
 
-    public Vehicle(String plateNumber, int basePrice, boolean archived, int rented, String discriminator) {
+    public Vehicle(String plateNumber, int basePrice, boolean archived, String discriminator) {
         this.plateNumber = plateNumber;
         this.basePrice = basePrice;
         this.archived = archived;
-        this.rented = rented;
         this.discriminator = discriminator;
     }
 
@@ -81,14 +76,6 @@ public class Vehicle {
 
     public void setArchived(boolean archived) {
         this.archived = archived;
-    }
-
-    public int getRented() {
-        return rented;
-    }
-
-    public void setRented(int rented) {
-        this.rented = rented;
     }
 
     public String getDiscriminator() {

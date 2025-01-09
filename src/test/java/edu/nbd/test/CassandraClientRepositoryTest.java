@@ -18,17 +18,9 @@ public class CassandraClientRepositoryTest {
         CASSANDRA_CLIENT_REPOSITORY = new CassandraClientRepository();
     }
 
-    @BeforeEach
+    @AfterEach
     public void cleanUp() {
         SimpleStatement truncateClients = QueryBuilder.truncate(CqlIdentifier.fromCql("clients")).build();
-
-        CASSANDRA_CLIENT_REPOSITORY.getSession().execute(truncateClients);
-    }
-
-    @AfterAll
-    public static void tearDown() {
-        SimpleStatement truncateClients = QueryBuilder.truncate(CqlIdentifier.fromCql("clients")).build();
-
         CASSANDRA_CLIENT_REPOSITORY.getSession().execute(truncateClients);
     }
 

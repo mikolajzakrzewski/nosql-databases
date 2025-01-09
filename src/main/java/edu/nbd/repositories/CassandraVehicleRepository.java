@@ -26,7 +26,6 @@ public class CassandraVehicleRepository extends CassandraRepository implements I
                 .withPartitionKey(CqlIdentifier.fromCql("plate_number"), DataTypes.TEXT)
                 .withColumn(CqlIdentifier.fromCql("base_price"), DataTypes.INT)
                 .withColumn(CqlIdentifier.fromCql("archived"), DataTypes.BOOLEAN)
-                .withColumn(CqlIdentifier.fromCql("rented"), DataTypes.INT)
                 .withColumn(CqlIdentifier.fromCql("discriminator"), DataTypes.TEXT)
                 .withColumn(CqlIdentifier.fromCql("engine_displacement"), DataTypes.INT)
                 .build();
