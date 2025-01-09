@@ -8,7 +8,7 @@ import edu.nbd.providers.VehicleProvider;
 
 @Dao
 public interface VehicleDao {
-    @StatementAttributes(consistencyLevel = "ONE", pageSize = 100)
+    @StatementAttributes(consistencyLevel = "ONE")
     @QueryProvider(providerClass = VehicleProvider.class, entityHelpers = {Bicycle.class, MotorVehicle.class})
     Vehicle findById(String plateNumber);
 
@@ -20,6 +20,7 @@ public interface VehicleDao {
     @QueryProvider(providerClass = VehicleProvider.class, entityHelpers = {Bicycle.class, MotorVehicle.class})
     void update(Vehicle vehicle);
 
+    @StatementAttributes(consistencyLevel = "QUORUM")
     @Delete
     void delete(Vehicle vehicle);
 }
