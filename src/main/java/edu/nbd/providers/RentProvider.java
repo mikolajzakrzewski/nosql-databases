@@ -4,10 +4,10 @@ import com.datastax.oss.driver.api.core.CqlIdentifier;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BatchStatement;
 import com.datastax.oss.driver.api.core.cql.BatchType;
-import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.mapper.MapperContext;
 import com.datastax.oss.driver.api.querybuilder.delete.Delete;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
+import com.datastax.oss.driver.api.querybuilder.insert.Insert;
 import com.datastax.oss.driver.api.querybuilder.relation.Relation;
 import com.datastax.oss.driver.api.querybuilder.select.Select;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
@@ -37,7 +37,16 @@ public class RentProvider {
     }
 
     public void add(Rent rent) {
-        SimpleStatement insertRentByClient = QueryBuilder
+
+        if (findByClientId(rent.getPersonalId()).stream().filter(r -> r.getEndTime() == null).count() >= rent.getClient().getClientType().getMaxVehicles()) {
+            throw new IllegalStateException("Client reached maximum number of rents");
+        }
+
+        if (findByVehicleId(rent.getPlateNumber()).stream().anyMatch(r -> r.getEndTime() == null)) {
+            throw new IllegalStateException("Vehicle is already rented");
+        }
+
+        Insert insertRentByClient = QueryBuilder
                 .insertInto(RENTS_BY_CLIENT)
                 .value(RENT_ID, QueryBuilder.literal(rent.getId()))
                 .value(PERSONAL_ID, QueryBuilder.literal(rent.getPersonalId()))
@@ -45,13 +54,9 @@ public class RentProvider {
                 .value(BEGIN_TIME, QueryBuilder.literal(rent.getBeginTime(), timeCodec))
                 .value(END_TIME, QueryBuilder.literal(rent.getEndTime(), timeCodec))
                 .value(RENT_COST, QueryBuilder.literal(rent.getRentCost()))
-                .value(ARCHIVED, QueryBuilder.literal(rent.isArchived()))
-                .ifNotExists()
-                .build();
+                .value(ARCHIVED, QueryBuilder.literal(rent.isArchived()));
 
-        session.execute(insertRentByClient);
-
-        SimpleStatement insertRentByVehicle = QueryBuilder
+        Insert insertRentByVehicle = QueryBuilder
                 .insertInto(RENTS_BY_VEHICLE)
                 .value(RENT_ID, QueryBuilder.literal(rent.getId()))
                 .value(PERSONAL_ID, QueryBuilder.literal(rent.getPersonalId()))
@@ -59,11 +64,14 @@ public class RentProvider {
                 .value(BEGIN_TIME, QueryBuilder.literal(rent.getBeginTime(), timeCodec))
                 .value(END_TIME, QueryBuilder.literal(rent.getEndTime(), timeCodec))
                 .value(RENT_COST, QueryBuilder.literal(rent.getRentCost()))
-                .value(ARCHIVED, QueryBuilder.literal(rent.isArchived()))
-                .ifNotExists()
+                .value(ARCHIVED, QueryBuilder.literal(rent.isArchived()));
+
+        BatchStatement batch = BatchStatement.builder(BatchType.LOGGED)
+                .addStatement(insertRentByClient.build())
+                .addStatement(insertRentByVehicle.build())
                 .build();
 
-        session.execute(insertRentByVehicle);
+        session.execute(batch);
     }
 
     public List<Rent> findByClientId(String clientId) {

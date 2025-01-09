@@ -19,20 +19,10 @@ public class CassandraRentRepositoryTest {
         CASSANDRA_RENT_REPOSITORY = new CassandraRentRepository();
     }
 
-    @BeforeEach
+    @AfterEach
     public void cleanUp() {
         SimpleStatement truncateRentsByClient = QueryBuilder.truncate(CqlIdentifier.fromCql("rents_by_client")).build();
         SimpleStatement truncateRentsByVehicle = QueryBuilder.truncate(CqlIdentifier.fromCql("rents_by_vehicle")).build();
-
-        CASSANDRA_RENT_REPOSITORY.getSession().execute(truncateRentsByClient);
-        CASSANDRA_RENT_REPOSITORY.getSession().execute(truncateRentsByVehicle);
-    }
-
-    @AfterAll
-    public static void tearDown() {
-        SimpleStatement truncateRentsByClient = QueryBuilder.truncate(CqlIdentifier.fromCql("rents_by_client")).build();
-        SimpleStatement truncateRentsByVehicle = QueryBuilder.truncate(CqlIdentifier.fromCql("rents_by_vehicle")).build();
-
         CASSANDRA_RENT_REPOSITORY.getSession().execute(truncateRentsByClient);
         CASSANDRA_RENT_REPOSITORY.getSession().execute(truncateRentsByVehicle);
     }
@@ -94,5 +84,27 @@ public class CassandraRentRepositoryTest {
         Assertions.assertEquals(1, CASSANDRA_RENT_REPOSITORY.findByClientId("11111111114").size());
         CASSANDRA_RENT_REPOSITORY.delete(rent);
         Assertions.assertEquals(0, CASSANDRA_RENT_REPOSITORY.findByClientId("11111111114").size());
+    }
+
+    @Test
+    public void add_ClientHasReachedMaxRents_ExceptionThrown() {
+        Client client = new Client("11111111115", "Firstname", "Lastname", new Default());
+        Bicycle bicycle = new Bicycle("EL11116", 50);
+        MotorVehicle motorVehicle = new MotorVehicle("EL11117", 100, 1000);
+        Rent rent = new Rent(8, client, bicycle, null);
+        CASSANDRA_RENT_REPOSITORY.add(rent);
+        Rent rent2 = new Rent(9, client, motorVehicle, null);
+        Assertions.assertThrows(IllegalStateException.class, () -> CASSANDRA_RENT_REPOSITORY.add(rent2));
+    }
+
+    @Test
+    public void add_VehicleIsAlreadyRented_ExceptionThrown() {
+        Client client = new Client("11111111116", "Firstname", "Lastname", new Default());
+        Client client2 = new Client("11111111117", "Firstname", "Lastname", new Default());
+        Bicycle bicycle = new Bicycle("EL11118", 50);
+        Rent rent = new Rent(10, client, bicycle, null);
+        CASSANDRA_RENT_REPOSITORY.add(rent);
+        Rent rent2 = new Rent(11, client2, bicycle, null);
+        Assertions.assertThrows(IllegalStateException.class, () -> CASSANDRA_RENT_REPOSITORY.add(rent2));
     }
 }

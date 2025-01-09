@@ -43,7 +43,7 @@ public class Rent {
         this.client = client;
         this.vehicle = vehicle;
         this.beginTime = Objects.requireNonNullElseGet(beginTime, LocalDateTime::now).withNano(0);
-        this.endTime = Objects.requireNonNullElseGet(endTime, LocalDateTime::now).withNano(0);
+        this.endTime = endTime;
         this.archived = archived;
         this.rentCost = rentCost;
         this.personalId = client.getPersonalID();
@@ -55,7 +55,7 @@ public class Rent {
         this.personalId = personalId;
         this.plateNumber = plateNumber;
         this.beginTime = Objects.requireNonNullElseGet(beginTime, LocalDateTime::now).withNano(0);
-        this.endTime = Objects.requireNonNullElseGet(endTime, LocalDateTime::now).withNano(0);
+        this.endTime = endTime;
         this.archived = archived;
         this.rentCost = rentCost;
     }
