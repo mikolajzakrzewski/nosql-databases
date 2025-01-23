@@ -1,7 +1,9 @@
 package edu.nbd.model;
 
-
 import edu.nbd.exceptions.RentException;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbCreator;
+import jakarta.json.bind.annotation.JsonbTransient;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
@@ -13,28 +15,35 @@ import java.util.Objects;
 public class Rent {
 
     @BsonId
+    @JsonbProperty("id")
     private long id;
 
     @BsonProperty("client")
+    @JsonbProperty("client")
     private Client client;
 
     @BsonProperty("vehicle")
+    @JsonbProperty("vehicle")
     private Vehicle vehicle;
 
     @BsonProperty("beginTime")
+    @JsonbProperty("beginTime")
     private LocalDateTime beginTime;
 
     @BsonProperty("endTime")
+    @JsonbProperty("endTime")
     private LocalDateTime endTime;
 
     @BsonProperty("rentCost")
+    @JsonbProperty("rentCost")
     private double rentCost = 0;
 
     @BsonCreator
-    public Rent(@BsonProperty("id") long id,
-                @BsonProperty("client") Client client,
-                @BsonProperty("vehicle") Vehicle vehicle,
-                @BsonProperty("beginTime") LocalDateTime beginTime) {
+    @JsonbCreator
+    public Rent(@BsonProperty("id") @JsonbProperty("id") long id,
+                @BsonProperty("client") @JsonbProperty("client") Client client,
+                @BsonProperty("vehicle") @JsonbProperty("vehicle") Vehicle vehicle,
+                @BsonProperty("beginTime") @JsonbProperty("beginTime") LocalDateTime beginTime) {
         this.id = id;
         this.client = client;
         this.vehicle = vehicle;
@@ -46,6 +55,7 @@ public class Rent {
     }
 
     @BsonIgnore
+    @JsonbTransient
     public String getRentInfo() {
         String className = "Rent";
         return className + id +
@@ -95,6 +105,7 @@ public class Rent {
         rentCost = rentCostEndRent;
     }
 
+    @JsonbTransient
     public int getRentDays() {
         return (endTime == null) ? 0 : (int) java.time.Duration.between(beginTime, endTime).toDays() + 1;
     }

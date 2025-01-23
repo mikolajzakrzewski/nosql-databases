@@ -1,28 +1,39 @@
 package edu.nbd.model;
 
 import edu.nbd.exceptions.VehicleException;
+import jakarta.json.bind.annotation.*;
 import org.bson.codecs.pojo.annotations.*;
 
+@JsonbTypeInfo({
+        @JsonbSubtype(alias = "bicycle", type = Bicycle.class),
+        @JsonbSubtype(alias = "motor_vehicle", type = MotorVehicle.class)
+})
 @BsonDiscriminator(key = "_type")
 public abstract class Vehicle {
+
     @BsonId
+    @JsonbProperty("plateNumber")
     private String plateNumber;
 
     @BsonProperty("basePrice")
+    @JsonbProperty("basePrice")
     private int basePrice;
 
     @BsonProperty("archived")
+    @JsonbProperty("archived")
     private boolean archived = false;
 
     @BsonProperty("rented")
+    @JsonbProperty("rented")
     private int rented = 0;
 
     public Vehicle() {
     }
 
     @BsonCreator
-    public Vehicle(@BsonProperty("plateNumber") String plateNumber,
-                   @BsonProperty("basePrice") int basePrice) {
+    @JsonbCreator
+    public Vehicle(@BsonProperty("plateNumber") @JsonbProperty("plateNumber") String plateNumber,
+                   @BsonProperty("basePrice") @JsonbProperty("basePrice") int basePrice) {
         this.plateNumber = plateNumber;
         this.basePrice = basePrice;
         this.archived = false;
@@ -30,14 +41,17 @@ public abstract class Vehicle {
     }
 
     @BsonIgnore
+    @JsonbTransient  // Exclude from serialization and deserialization
     public String getVehicleInfo() {
         return plateNumber + basePrice;
     }
 
+    @JsonbProperty("plateNumber")  // Serialize plateNumber as JSON property
     public String getPlateNumber() {
         return plateNumber;
     }
 
+    @JsonbProperty("plateNumber")  // Serialize plateNumber as JSON property
     public void setPlateNumber(String plateNumber) {
         if (plateNumber != null && !plateNumber.isEmpty()) {
             this.plateNumber = plateNumber;
@@ -46,10 +60,12 @@ public abstract class Vehicle {
         }
     }
 
+    @JsonbProperty("basePrice")  // Serialize basePrice as JSON property
     public int getBasePrice() {
         return basePrice;
     }
 
+    @JsonbProperty("basePrice")  // Serialize basePrice as JSON property
     public void setBasePrice(int basePrice) {
         if (basePrice > 0) {
             this.basePrice = basePrice;
@@ -58,28 +74,35 @@ public abstract class Vehicle {
         }
     }
 
+    @BsonIgnore
+    @JsonbTransient
     public double getActualRentalPrice() {
         return basePrice;
     }
 
+    @JsonbProperty("archived")
     public boolean isArchived() {
         return archived;
     }
 
+    @JsonbProperty("archived")
     public void setArchived(boolean archived) {
         this.archived = archived;
     }
 
+    @JsonbProperty("rented")
     public int getRented() {
         return rented;
     }
 
     @BsonIgnore
+    @JsonbTransient
     public String getInfo() {
         return getVehicleInfo();
     }
 
     @BsonIgnore
+    @JsonbTransient
     public String getId() {
         return getPlateNumber();
     }

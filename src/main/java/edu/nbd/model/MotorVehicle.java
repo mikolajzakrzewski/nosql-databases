@@ -1,5 +1,7 @@
 package edu.nbd.model;
 
+import jakarta.json.bind.annotation.JsonbCreator;
+import jakarta.json.bind.annotation.JsonbProperty;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
@@ -8,12 +10,14 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 public class MotorVehicle extends Vehicle {
 
     @BsonProperty("engineDisplacement")
+    @JsonbProperty("engineDisplacement")
     private int engineDisplacement;
 
     @BsonCreator
-    public MotorVehicle(@BsonProperty("plateNumber") String plateNumber,
-                        @BsonProperty("basePrice") int basePrice,
-                        @BsonProperty("engineDisplacement") int engineDisplacement) {
+    @JsonbCreator
+    public MotorVehicle(@BsonProperty("plateNumber") @JsonbProperty("plateNumber") String plateNumber,
+                        @BsonProperty("basePrice") @JsonbProperty("basePrice") int basePrice,
+                        @BsonProperty("engineDisplacement") @JsonbProperty("engineDisplacement") int engineDisplacement) {
         super(plateNumber, basePrice);
         this.engineDisplacement = engineDisplacement;
     }
