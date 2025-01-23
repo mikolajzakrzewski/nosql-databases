@@ -1,6 +1,7 @@
 package edu.nbd.kafka;
 
 import edu.nbd.model.Rent;
+import edu.nbd.model.RentWrapper;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import org.apache.kafka.clients.admin.*;
@@ -61,12 +62,13 @@ public class Producer {
         producer = new KafkaProducer<>(producerConfig);
     }
 
-    public void sendRent(Rent rent) throws ExecutionException, InterruptedException {
+    public void sendRent(Rent rent, String rentalName) throws ExecutionException, InterruptedException {
         producer.initTransactions();
         try {
             producer.beginTransaction();
-            String jsonRent = jsonb.toJson(rent);
-            ProducerRecord<Long, String> record = new ProducerRecord<>(RENT_TOPIC, rent.getId(), jsonRent);
+            RentWrapper rentWrapper = new RentWrapper(rent, rentalName);
+            String jsonRentWrapper = jsonb.toJson(rentWrapper);
+            ProducerRecord<Long, String> record = new ProducerRecord<>(RENT_TOPIC, rent.getId(), jsonRentWrapper);
             producer.send(record);
 //            Future<RecordMetadata> sent = producer.send(record);
 //            RecordMetadata recordMetadata = sent.get();

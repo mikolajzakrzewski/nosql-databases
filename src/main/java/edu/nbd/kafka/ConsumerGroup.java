@@ -1,6 +1,7 @@
 package edu.nbd.kafka;
 
 import edu.nbd.model.Rent;
+import edu.nbd.model.RentWrapper;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
@@ -27,7 +28,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class Consumer {
+public class ConsumerGroup {
 
     private final List<KafkaConsumer<Long, String>> consumerGroup = new ArrayList<>();
     private static final String RENT_TOPIC = "rents";
@@ -71,11 +72,13 @@ public class Consumer {
 //            consumer.seekToBeginning(consumerAssignment);
 
             Duration timeout = Duration.of(100, ChronoUnit.MILLIS);
-            MessageFormat formatter = new MessageFormat("Consumer {5}, Topic {0}, partition {1}, offset {2, number, integer}, key {3}, value {4}");
+            MessageFormat formatter = new MessageFormat("ConsumerGroup {5}, Topic {0}, partition {1}, offset {2, number, integer}, key {3}, value {4}");
             while (true) {
                 ConsumerRecords<Long, String> records = consumer.poll(timeout);
                 for (ConsumerRecord<Long, String> record : records) {
-                    Rent rent = jsonb.fromJson(record.value(), Rent.class);
+                    RentWrapper rentWrapper = jsonb.fromJson(record.value(), RentWrapper.class);
+                    Rent rent = rentWrapper.getRent();
+                    System.out.println(rent.getRentInfo() + " dupa");
                     // no i tu cos z tym rentem do zdzialania
                     String result = formatter.format(new Object[]{
                             record.topic(),
