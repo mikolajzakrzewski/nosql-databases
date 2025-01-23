@@ -24,10 +24,10 @@ import java.util.List;
 
 public abstract class AbstractMongoRepository implements AutoCloseable {
 
-    private ConnectionString connectionString = new ConnectionString("mongodb://mongodb1:27017,mongodb2:27018,mongodb3:27019/?replicaSet=replica_set_single");
-    private MongoCredential credential = MongoCredential.createCredential("nbd", "admin", "nbdpassword".toCharArray());
+    private final ConnectionString connectionString = new ConnectionString("mongodb://mongodb1:27017,mongodb2:27018,mongodb3:27019/?replicaSet=replica_set_single");
+    private final MongoCredential credential = MongoCredential.createCredential("nbd", "admin", "nbdpassword".toCharArray());
 
-    private CodecRegistry pojoCodecRegistry = CodecRegistries.fromProviders(
+    private final CodecRegistry pojoCodecRegistry = CodecRegistries.fromProviders(
             PojoCodecProvider.builder()
                     .automatic(true)
                     .conventions(List.of(Conventions.ANNOTATION_CONVENTION))

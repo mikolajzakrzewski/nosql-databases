@@ -1,7 +1,5 @@
-package edu.nbd.kafka;
+package edu.nbd;
 
-import edu.nbd.model.Rent;
-import edu.nbd.model.RentWrapper;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
@@ -18,6 +16,8 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.LongDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.time.Duration;
@@ -29,11 +29,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class ConsumerGroup {
-
     private final List<KafkaConsumer<Long, String>> consumerGroup = new ArrayList<>();
     private static final String RENT_TOPIC = "rents";
     private static final String CONSUMER_GROUP_NAME = "rents-consumer-group";
     private final Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withFormatting(true));
+    private MessageSaver messageSaver = new MessageSaver();
+    private static final Logger log = LoggerFactory.getLogger(ConsumerGroup.class);
 
     public void initConsumerGroup() {
         Properties consumerConfig = new Properties();
@@ -65,9 +66,11 @@ public class ConsumerGroup {
     }
 
     private void consume(KafkaConsumer<Long, String> consumer) {
+        boolean saved = false;
         try {
             consumer.poll(Duration.of(1000, ChronoUnit.MILLIS));
             Set<TopicPartition> consumerAssignment = consumer.assignment();
+            log.info("Konsument przypisany do partycji: {}", consumerAssignment);
             System.out.println(consumer.groupMetadata().memberId() + " " + consumerAssignment);
 //            consumer.seekToBeginning(consumerAssignment);
 
@@ -76,10 +79,6 @@ public class ConsumerGroup {
             while (true) {
                 ConsumerRecords<Long, String> records = consumer.poll(timeout);
                 for (ConsumerRecord<Long, String> record : records) {
-                    RentWrapper rentWrapper = jsonb.fromJson(record.value(), RentWrapper.class);
-                    Rent rent = rentWrapper.getRent();
-                    System.out.println(rent.getRentInfo() + " dupa");
-                    // no i tu cos z tym rentem do zdzialania
                     String result = formatter.format(new Object[]{
                             record.topic(),
                             record.partition(),
@@ -88,7 +87,13 @@ public class ConsumerGroup {
                             record.value(),
                             consumer.groupMetadata().memberId()
                     });
+                    if(!saved) {
+                        messageSaver.saveToMongoRepository(record.value());
+                        log.info("Wiadomość zapisana do MongoDB: {}", record.value());
+                    }
+                    saved = true;
                     System.out.println(result);
+                    consumer.commitAsync();
                 }
             }
         } catch (WakeupException we) {

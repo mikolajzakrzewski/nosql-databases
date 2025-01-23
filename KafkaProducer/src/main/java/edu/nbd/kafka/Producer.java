@@ -68,6 +68,7 @@ public class Producer {
             producer.beginTransaction();
             RentWrapper rentWrapper = new RentWrapper(rent, rentalName);
             String jsonRentWrapper = jsonb.toJson(rentWrapper);
+            log.info("Producent wysyła wiadomość: {}", jsonRentWrapper);
             ProducerRecord<Long, String> record = new ProducerRecord<>(RENT_TOPIC, rent.getId(), jsonRentWrapper);
             producer.send(record);
 //            Future<RecordMetadata> sent = producer.send(record);
@@ -77,5 +78,9 @@ public class Producer {
             producer.abortTransaction();
             throw e;
         }
+    }
+
+    public Jsonb getJsonb() {
+        return this.jsonb;
     }
 }
