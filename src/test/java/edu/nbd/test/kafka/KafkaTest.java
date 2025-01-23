@@ -3,6 +3,10 @@ package edu.nbd.test.kafka;
 import edu.nbd.kafka.Consumer;
 import edu.nbd.kafka.Producer;
 import edu.nbd.model.*;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbConfig;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -20,8 +24,11 @@ public class KafkaTest {
         Client client = new Client("11111111110", "Firstname", "Lastname", new Default());
         Bicycle bicycle = new Bicycle("EL12346", 10);
         Rent rent = new Rent(10000, client, bicycle, LocalDateTime.now());
-        producer.send(rent);
+        producer.sendRent(rent);
         Consumer consumer = new Consumer();
+        consumer.initConsumerGroup();
+        consumer.consumeTopicsByGroup();
+        Thread.sleep(10000);
         consumer.consumeTopicsByGroup();
     }
 }

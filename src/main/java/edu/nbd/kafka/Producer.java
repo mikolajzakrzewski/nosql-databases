@@ -55,17 +55,25 @@ public class Producer {
         producerConfig.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         producerConfig.put(ProducerConfig.CLIENT_ID_CONFIG, "local");
         producerConfig.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka1:9192,kafka2:9292,kafka3:9392");
-        producerConfig.put(ProducerConfig.ACKS_CONFIG, "all");
-        producerConfig.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
-        // to bedzie pozniej chyba zamiast tego enable idempotence
-//        producerConfig.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "d45a2245-cb41-43a6-8090-3f95080ae586");
+//        producerConfig.put(ProducerConfig.ACKS_CONFIG, "all");
+//        producerConfig.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
+        producerConfig.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "d45a2245-cb41-43a6-8090-3f95080ae586");
         producer = new KafkaProducer<>(producerConfig);
     }
 
-    public void send(Rent rent) throws ExecutionException, InterruptedException {
-        String jsonRent = jsonb.toJson(rent);
-        ProducerRecord<Long, String> record = new ProducerRecord<>(RENT_TOPIC, rent.getId(), jsonRent);
-        Future<RecordMetadata> sent = producer.send(record);
-        RecordMetadata recordMetadata = sent.get();
+    public void sendRent(Rent rent) throws ExecutionException, InterruptedException {
+        producer.initTransactions();
+        try {
+            producer.beginTransaction();
+            String jsonRent = jsonb.toJson(rent);
+            ProducerRecord<Long, String> record = new ProducerRecord<>(RENT_TOPIC, rent.getId(), jsonRent);
+            producer.send(record);
+//            Future<RecordMetadata> sent = producer.send(record);
+//            RecordMetadata recordMetadata = sent.get();
+            producer.commitTransaction();
+        } catch (Exception e) {
+            producer.abortTransaction();
+            throw e;
+        }
     }
 }

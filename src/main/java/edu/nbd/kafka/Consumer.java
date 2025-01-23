@@ -29,17 +29,17 @@ import java.util.concurrent.Future;
 
 public class Consumer {
 
-    private List<KafkaConsumer<Long, String>> consumerGroup = new ArrayList<>();
+    private final List<KafkaConsumer<Long, String>> consumerGroup = new ArrayList<>();
     private static final String RENT_TOPIC = "rents";
     private static final String CONSUMER_GROUP_NAME = "rents-consumer-group";
     private final Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withFormatting(true));
 
-    private void initConsumerGroup() {
+    public void initConsumerGroup() {
         Properties consumerConfig = new Properties();
         consumerConfig.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class.getName());
         consumerConfig.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         consumerConfig.put(ConsumerConfig.GROUP_ID_CONFIG, CONSUMER_GROUP_NAME);
-//        consumerConfig.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
+        consumerConfig.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
         consumerConfig.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka1:9192,kafka2:9292,kafka3:9392");
 
         for (int i = 0; i < 3; i++) {
@@ -65,13 +65,13 @@ public class Consumer {
 
     private void consume(KafkaConsumer<Long, String> consumer) {
         try {
-            consumer.poll(0);
+            consumer.poll(Duration.of(1000, ChronoUnit.MILLIS));
             Set<TopicPartition> consumerAssignment = consumer.assignment();
             System.out.println(consumer.groupMetadata().memberId() + " " + consumerAssignment);
-            consumer.seekToBeginning(consumerAssignment);
+//            consumer.seekToBeginning(consumerAssignment);
 
             Duration timeout = Duration.of(100, ChronoUnit.MILLIS);
-            MessageFormat formatter = new MessageFormat("Consumer {0}, partition {1}, offset {2, number, integer}, key {3}, value {4}");
+            MessageFormat formatter = new MessageFormat("Consumer {5}, Topic {0}, partition {1}, offset {2, number, integer}, key {3}, value {4}");
             while (true) {
                 ConsumerRecords<Long, String> records = consumer.poll(timeout);
                 for (ConsumerRecord<Long, String> record : records) {
@@ -94,7 +94,6 @@ public class Consumer {
     }
 
     public void consumeTopicsByGroup() throws InterruptedException {
-        initConsumerGroup();
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         for (KafkaConsumer<Long, String> consumer : consumerGroup) {
             executorService.execute(() -> consume(consumer));
