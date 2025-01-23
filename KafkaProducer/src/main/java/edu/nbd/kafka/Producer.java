@@ -60,10 +60,10 @@ public class Producer {
 //        producerConfig.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
         producerConfig.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "d45a2245-cb41-43a6-8090-3f95080ae586");
         producer = new KafkaProducer<>(producerConfig);
+        producer.initTransactions();
     }
 
     public void sendRent(Rent rent, String rentalName) throws ExecutionException, InterruptedException {
-        producer.initTransactions();
         try {
             producer.beginTransaction();
             RentWrapper rentWrapper = new RentWrapper(rent, rentalName);

@@ -1,5 +1,8 @@
 package edu.nbd;
 
+import edu.nbd.model.Rent;
+import edu.nbd.model.RentWrapper;
+import edu.nbd.repositories.RentRepository;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
@@ -33,7 +36,7 @@ public class ConsumerGroup {
     private static final String RENT_TOPIC = "rents";
     private static final String CONSUMER_GROUP_NAME = "rents-consumer-group";
     private final Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withFormatting(true));
-    private MessageSaver messageSaver = new MessageSaver();
+    private RentRepository rentRepository = new RentRepository();
     private static final Logger log = LoggerFactory.getLogger(ConsumerGroup.class);
 
     public void initConsumerGroup() {
@@ -79,21 +82,19 @@ public class ConsumerGroup {
             while (true) {
                 ConsumerRecords<Long, String> records = consumer.poll(timeout);
                 for (ConsumerRecord<Long, String> record : records) {
-                    String result = formatter.format(new Object[]{
-                            record.topic(),
-                            record.partition(),
-                            record.offset(),
-                            record.key(),
-                            record.value(),
-                            consumer.groupMetadata().memberId()
-                    });
-                    if(!saved) {
-                        messageSaver.saveToMongoRepository(record.value());
-                        log.info("Wiadomość zapisana do MongoDB: {}", record.value());
+                    try {
+                        RentWrapper rentWrapper = jsonb.fromJson(record.value(), RentWrapper.class);
+                        Rent rent = rentWrapper.getRent();
+                        if (!saved) {
+                            rentRepository.add(rent);
+                            log.info("Wiadomość zapisana do MongoDB: {}", record.value());
+                        }
+                        saved = true;
+                        System.out.println(rent);
+                        consumer.commitAsync();
+                    } catch (Exception e) {
+                        log.error("Błąd podczas zapisu do bazy danych", e);
                     }
-                    saved = true;
-                    System.out.println(result);
-                    consumer.commitAsync();
                 }
             }
         } catch (WakeupException we) {

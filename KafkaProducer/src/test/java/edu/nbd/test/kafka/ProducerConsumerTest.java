@@ -3,7 +3,9 @@ package edu.nbd.test.kafka;
 import com.mongodb.client.model.Filters;
 import edu.nbd.kafka.Producer;
 import edu.nbd.model.*;
+import edu.nbd.repositories.ClientRepository;
 import edu.nbd.repositories.RentRepository;
+import edu.nbd.repositories.VehicleRepository;
 import edu.nbd.test.repositories.RentRepositoryTest;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -13,12 +15,11 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.concurrent.ExecutionException;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-
 public class ProducerConsumerTest {
     private static Process consumerProcess;
     private final static RentRepository rentRepository = new RentRepository();
+    private final static ClientRepository clientRepository = new ClientRepository();
+    private final static VehicleRepository vehicleRepository = new VehicleRepository();
 
     @BeforeAll
     public static void setUp() throws IOException, InterruptedException {
@@ -28,13 +29,23 @@ public class ProducerConsumerTest {
                 "../KafkaConsumer/target/KafkaConsumer-1.0-SNAPSHOT.jar"
         ).inheritIO().start();
         Thread.sleep(3000);
+    }
+
+    @BeforeEach
+    public void databseSetUp(){
+        clientRepository.getDatabase().getCollection("clients", Client.class).deleteMany(new Document());
+        vehicleRepository.getDatabase().getCollection("vehicles", Vehicle.class).deleteMany(new Document());
         rentRepository.getDatabase().getCollection("rents", Rent.class).deleteMany(new Document());
     }
 
     @AfterAll
     public static void tearDown() {
         consumerProcess.destroy();
+        clientRepository.getDatabase().getCollection("clients", Client.class).deleteMany(new Document());
+        vehicleRepository.getDatabase().getCollection("vehicles", Vehicle.class).deleteMany(new Document());
         rentRepository.getDatabase().getCollection("rents", Rent.class).deleteMany(new Document());
+        clientRepository.close();
+        vehicleRepository.close();
         rentRepository.close();
     }
 
@@ -49,12 +60,38 @@ public class ProducerConsumerTest {
         Rent rent = new Rent(10000, client, bicycle, now);
         producer.sendRent(rent, "Car Rental");
 
-        Thread.sleep(3000);
+        Thread.sleep(5000);
 
         Rent savedRent;
         Bson filter = Filters.eq("_id", rent.getId());
         savedRent = rentRepository.getDatabase().getCollection("rents", Rent.class).find(filter).first();
         Assertions.assertNotNull(savedRent);
         Assertions.assertEquals(rentRepository.findById(rent.getId()).getRentInfo(), savedRent.getRentInfo());
+    }
+
+    @Test
+    public void producer_consumer_integration_multiple_rents() throws InterruptedException, ExecutionException {
+        Producer producer = new Producer();
+        Producer.initProducer();
+
+        int numberOfRents = 3;
+        for (int i = 1; i <= numberOfRents; i++) {
+            Client client = new Client("1111111111" + i, "Firstname" + i, "Lastname" + i, new Default());
+            Bicycle bicycle = new Bicycle("EL1234" + i, 10 + i);
+            LocalDateTime now = LocalDateTime.of(2025, 1, i, 12, 0);
+            Rent rent = new Rent(i, client, bicycle, now);
+
+            producer.sendRent(rent, "Car Rental");
+        }
+
+        Thread.sleep(5000);
+
+        for (int i = 1; i <= numberOfRents; i++) {
+            Rent savedRent;
+            Bson filter = Filters.eq("_id", i);
+            savedRent = rentRepository.getDatabase().getCollection("rents", Rent.class).find(filter).first();
+            Assertions.assertNotNull(savedRent);
+            Assertions.assertEquals(rentRepository.findById(i).getRentInfo(), savedRent.getRentInfo());
+ }
     }
 }
