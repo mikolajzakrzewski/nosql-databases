@@ -28,7 +28,7 @@ public class ProducerConsumerTest {
                 "-jar",
                 "../KafkaConsumer/target/KafkaConsumer-1.0-SNAPSHOT.jar"
         ).inheritIO().start();
-        Thread.sleep(3000);
+        Thread.sleep(10000);
     }
 
     @BeforeEach
@@ -60,10 +60,13 @@ public class ProducerConsumerTest {
         Rent rent = new Rent(10000, client, bicycle, now);
         producer.sendRent(rent, "Car Rental");
 
-        Thread.sleep(5000);
+        long timeout = System.currentTimeMillis() + 60000;
 
         Rent savedRent;
         Bson filter = Filters.eq("_id", rent.getId());
+        while (rentRepository.getDatabase().getCollection("rents", Rent.class).find(filter).first() == null && System.currentTimeMillis() < timeout) {
+            Thread.sleep(100);
+        }
         savedRent = rentRepository.getDatabase().getCollection("rents", Rent.class).find(filter).first();
         Assertions.assertNotNull(savedRent);
         Assertions.assertEquals(rentRepository.findById(rent.getId()).getRentInfo(), savedRent.getRentInfo());
@@ -84,14 +87,17 @@ public class ProducerConsumerTest {
             producer.sendRent(rent, "Car Rental");
         }
 
-        Thread.sleep(5000);
+        long timeout = System.currentTimeMillis() + 60000;
 
         for (int i = 1; i <= numberOfRents; i++) {
             Rent savedRent;
             Bson filter = Filters.eq("_id", i);
+            while (rentRepository.getDatabase().getCollection("rents", Rent.class).find(filter).first() == null && System.currentTimeMillis() < timeout) {
+                Thread.sleep(100);
+            }
             savedRent = rentRepository.getDatabase().getCollection("rents", Rent.class).find(filter).first();
             Assertions.assertNotNull(savedRent);
             Assertions.assertEquals(rentRepository.findById(i).getRentInfo(), savedRent.getRentInfo());
- }
+        }
     }
 }

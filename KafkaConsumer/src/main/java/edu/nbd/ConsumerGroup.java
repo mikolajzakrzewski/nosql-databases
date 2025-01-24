@@ -26,10 +26,7 @@ import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 public class ConsumerGroup {
     private final List<KafkaConsumer<Long, String>> consumerGroup = new ArrayList<>();
@@ -45,11 +42,14 @@ public class ConsumerGroup {
         consumerConfig.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         consumerConfig.put(ConsumerConfig.GROUP_ID_CONFIG, CONSUMER_GROUP_NAME);
         consumerConfig.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
+        consumerConfig.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        consumerConfig.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
         consumerConfig.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka1:9192,kafka2:9292,kafka3:9392");
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             KafkaConsumer<Long, String> consumer = new KafkaConsumer<>(consumerConfig);
             consumer.subscribe(List.of(RENT_TOPIC));
+            log.info("Konsument zasubskrybował temat: {}", RENT_TOPIC);
             consumerGroup.add(consumer);
         }
     }
@@ -69,29 +69,29 @@ public class ConsumerGroup {
     }
 
     private void consume(KafkaConsumer<Long, String> consumer) {
-        boolean saved = false;
         try {
             consumer.poll(Duration.of(1000, ChronoUnit.MILLIS));
             Set<TopicPartition> consumerAssignment = consumer.assignment();
+            if (consumerAssignment.isEmpty()) {
+                consumer.poll(Duration.ofMillis(100));
+                consumer.seekToBeginning(consumer.assignment());
+            }
             log.info("Konsument przypisany do partycji: {}", consumerAssignment);
             System.out.println(consumer.groupMetadata().memberId() + " " + consumerAssignment);
 //            consumer.seekToBeginning(consumerAssignment);
 
             Duration timeout = Duration.of(100, ChronoUnit.MILLIS);
-            MessageFormat formatter = new MessageFormat("ConsumerGroup {5}, Topic {0}, partition {1}, offset {2, number, integer}, key {3}, value {4}");
             while (true) {
                 ConsumerRecords<Long, String> records = consumer.poll(timeout);
                 for (ConsumerRecord<Long, String> record : records) {
                     try {
                         RentWrapper rentWrapper = jsonb.fromJson(record.value(), RentWrapper.class);
                         Rent rent = rentWrapper.getRent();
-                        if (!saved) {
-                            rentRepository.add(rent);
-                            log.info("Wiadomość zapisana do MongoDB: {}", record.value());
-                        }
-                        saved = true;
+                        rentRepository.add(rent);
+                        log.info("Wiadomość zapisana do MongoDB: {}", record.value());
                         System.out.println(rent);
-                        consumer.commitAsync();
+                        log.info("Odczytano wiadomość, po save.");
+                        consumer.commitSync();
                     } catch (Exception e) {
                         log.error("Błąd podczas zapisu do bazy danych", e);
                     }
@@ -103,14 +103,26 @@ public class ConsumerGroup {
     }
 
     public void consumeTopicsByGroup() throws InterruptedException {
-        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        ExecutorService executorService = Executors.newFixedThreadPool(consumerGroup.size());
+
         for (KafkaConsumer<Long, String> consumer : consumerGroup) {
-            executorService.execute(() -> consume(consumer));
+            executorService.execute(() -> {
+                try {
+                    consume(consumer);
+                } catch (Exception e) {
+                    log.error("Błąd w konsumentach", e);
+                }
+            });
         }
-        Thread.sleep(10000);
+
+        executorService.shutdown();
+        if (!executorService.awaitTermination(30, TimeUnit.SECONDS)) {
+            log.warn("Konsumenci nie zakończyli pracy w określonym czasie, wymuszenie zakończenia...");
+            executorService.shutdownNow();
+        }
+
         for (KafkaConsumer<Long, String> consumer : consumerGroup) {
             consumer.wakeup();
         }
-        executorService.shutdown();
     }
 }
