@@ -5,6 +5,7 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import edu.nbd.kafka.Producer;
 import edu.nbd.model.Client;
 import edu.nbd.model.Rent;
 import edu.nbd.model.Vehicle;
@@ -13,6 +14,23 @@ import org.bson.conversions.Bson;
 import java.util.ArrayList;
 
 public class RentRepository extends AbstractMongoRepository {
+
+    private final Producer producer = new Producer();
+
+    public RentRepository() {
+        try {
+            producer.initProducer();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Rent findConsumerRentById(Object id) {
+        Bson filter = Filters.eq("_id", id);
+        MongoCollection<Rent> collection = getDatabase().getCollection("rents-consumer", Rent.class);
+        FindIterable<Rent> rents = collection.find(filter);
+        return rents.first();
+    }
 
     public Rent findById(Object id) {
         Bson filter = Filters.eq("_id", id);
@@ -52,9 +70,10 @@ public class RentRepository extends AbstractMongoRepository {
             clientsCollection.updateOne(clientSession, clientFilter, clientUpdates);
 
             clientSession.commitTransaction();
+            producer.sendRent(rent, "Car Rental");
         } catch (Exception e) {
             clientSession.abortTransaction();
-            throw e;
+            throw new RuntimeException(e);
         } finally {
             clientSession.close();
         }
